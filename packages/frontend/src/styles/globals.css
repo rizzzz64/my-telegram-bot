@@ -1,0 +1,106 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --tg-theme-bg-color: #0F0F1A;
+  --tg-theme-text-color: #F1F5F9;
+  --tg-theme-hint-color: #94A3B8;
+  --tg-theme-link-color: #8B5CF6;
+  --tg-theme-button-color: #8B5CF6;
+  --tg-theme-button-text-color: #FFFFFF;
+  --tg-theme-secondary-bg-color: #161625;
+
+  --safe-area-top: env(safe-area-inset-top, 0px);
+  --safe-area-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+* {
+  -webkit-tap-highlight-color: transparent;
+  box-sizing: border-box;
+}
+
+html, body {
+  overscroll-behavior: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: #0F0F1A;
+  color: #F1F5F9;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  min-height: 100dvh;
+  overflow-x: hidden;
+}
+
+#root {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: #161625; }
+::-webkit-scrollbar-thumb { background: #3B3B5C; border-radius: 2px; }
+::-webkit-scrollbar-thumb:hover { background: #8B5CF6; }
+
+/* Rarity gradients */
+.rarity-common { background: linear-gradient(135deg, #2D3748, #4A5568); }
+.rarity-uncommon { background: linear-gradient(135deg, #064E3B, #065F46); }
+.rarity-rare { background: linear-gradient(135deg, #1E3A8A, #1D4ED8); }
+.rarity-epic { background: linear-gradient(135deg, #4C1D95, #6D28D9); }
+.rarity-legendary { background: linear-gradient(135deg, #78350F, #B45309); }
+
+/* Glow effects */
+.glow-common { box-shadow: 0 0 15px rgba(148, 163, 184, 0.3); }
+.glow-uncommon { box-shadow: 0 0 15px rgba(16, 185, 129, 0.4); }
+.glow-rare { box-shadow: 0 0 15px rgba(59, 130, 246, 0.4); }
+.glow-epic { box-shadow: 0 0 20px rgba(139, 92, 246, 0.5); }
+.glow-legendary { box-shadow: 0 0 25px rgba(245, 158, 11, 0.6); }
+
+/* Neon button */
+.btn-neon {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.2s ease;
+}
+.btn-neon::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.1) 50%, transparent 70%);
+  transform: translateX(-100%);
+  transition: transform 0.4s ease;
+}
+.btn-neon:active::after { transform: translateX(100%); }
+.btn-neon:active { transform: scale(0.97); }
+
+/* Card hover */
+.card-hover {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.card-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+}
+.card-hover:active { transform: scale(0.98); }
+
+/* Modal backdrop */
+.modal-backdrop {
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+/* Roulette strip */
+.roulette-strip {
+  display: flex;
+  transition: transform 3s cubic-bezier(0.17, 0.67, 0.12, 0.99);
+}
+
+/* Safe areas */
+.safe-top { padding-top: var(--safe-area-top); }
+.safe-bottom { padding-bottom: var(--safe-area-bottom); }
+.pb-nav { padding-bottom: calc(70px + var(--safe-area-bottom)); }
