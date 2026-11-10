@@ -86,37 +86,46 @@ export function ProfilePage() {
     <div className="pb-nav">
       {/* Profile Header */}
       <div className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-purple-900/40 to-blue-900/40" />
+        <div
+          className="absolute inset-0"
+          style={{ background: 'linear-gradient(145deg, rgba(109,40,217,0.22) 0%, rgba(37,99,235,0.18) 100%)' }}
+        />
+        <div className="absolute inset-0" style={{ background: 'radial-gradient(ellipse at top left, rgba(139,92,246,0.15) 0%, transparent 60%)' }} />
         <div className="relative p-5">
           <div className="flex items-start gap-4">
-            <div className="w-20 h-20 rounded-2xl bg-bg-card border border-white/10 flex items-center justify-center text-5xl">
+            <div
+              className="w-20 h-20 rounded-2xl flex items-center justify-center text-5xl glass-card flex-shrink-0"
+              style={{ boxShadow: `0 0 24px ${rank.color}40` }}
+            >
               {user.rank === 'platinum' ? '💎' : user.rank === 'gold' ? '👑' : user.rank === 'silver' ? '🌟' : '⭐'}
             </div>
-            <div className="flex-1">
-              <h2 className="text-xl font-bold text-text-primary">
+            <div className="flex-1 min-w-0">
+              <h2 className="text-xl font-bold text-text-primary truncate">
                 {user.firstName} {user.lastName || ''}
               </h2>
               {user.username && <p className="text-text-muted text-sm">@{user.username}</p>}
-              <div className="flex items-center gap-2 mt-2">
-                <span className="text-sm font-bold" style={{ color: rank.color }}>{rank.label}</span>
-                <span className="text-xs text-text-muted">· Ур. {user.level}</span>
+              <div className="flex items-center gap-2 mt-2 flex-wrap">
+                <span className="text-sm font-bold px-2 py-0.5 rounded-full" style={{ color: rank.color, background: `${rank.color}18`, border: `1px solid ${rank.color}35` }}>
+                  {rank.label}
+                </span>
+                <span className="text-xs text-text-muted">Ур. {user.level}</span>
               </div>
             </div>
           </div>
 
           {/* XP Progress */}
           <div className="mt-4">
-            <div className="flex justify-between text-xs text-text-muted mb-1">
-              <span>Опыт: {user.experience.toLocaleString('ru-RU')}</span>
+            <div className="flex justify-between text-xs text-text-muted mb-1.5">
+              <span>{user.experience.toLocaleString('ru-RU')} XP</span>
               <span>До {rank.next}: {rank.nextXp.toLocaleString('ru-RU')}</span>
             </div>
-            <div className="h-2 bg-bg-card rounded-full overflow-hidden">
+            <div className="h-2.5 bg-black/30 rounded-full overflow-hidden border border-white/5">
               <motion.div
                 className="h-full rounded-full"
-                style={{ background: `linear-gradient(90deg, ${rank.color}, ${rank.color}88)` }}
+                style={{ background: `linear-gradient(90deg, ${rank.color}, ${rank.color}cc)`, boxShadow: `0 0 10px ${rank.color}80` }}
                 initial={{ width: 0 }}
                 animate={{ width: `${xpProgress}%` }}
-                transition={{ duration: 1, delay: 0.3 }}
+                transition={{ duration: 1.1, delay: 0.25, ease: 'easeOut' }}
               />
             </div>
           </div>
@@ -125,12 +134,12 @@ export function ProfilePage() {
 
       {/* Balance Cards */}
       <div className="flex gap-3 px-4 mt-4">
-        <div className="flex-1 bg-bg-card rounded-2xl p-4 border border-yellow-500/20">
-          <p className="text-xs text-text-muted">Монеты</p>
+        <div className="flex-1 premium-card rounded-2xl p-4 border-yellow-500/15" style={{ border: '1px solid rgba(245,158,11,0.18)' }}>
+          <p className="text-xs text-text-muted mb-1">Монеты</p>
           <p className="text-2xl font-bold text-yellow-400">🪙 {user.coins.toLocaleString('ru-RU')}</p>
         </div>
-        <div className="flex-1 bg-bg-card rounded-2xl p-4 border border-pink-500/20">
-          <p className="text-xs text-text-muted">Билеты</p>
+        <div className="flex-1 premium-card rounded-2xl p-4" style={{ border: '1px solid rgba(236,72,153,0.18)' }}>
+          <p className="text-xs text-text-muted mb-1">Билеты</p>
           <p className="text-2xl font-bold text-pink-400">🎟️ {user.tickets}</p>
         </div>
       </div>
@@ -159,7 +168,7 @@ export function ProfilePage() {
 
       {/* Promo Code */}
       <div className="px-4 mt-4">
-        <div className="bg-bg-card rounded-2xl p-4 border border-white/10">
+        <div className="premium-card rounded-2xl p-4">
           <h3 className="text-sm font-semibold text-text-secondary mb-3">🎟️ Промокод</h3>
           <div className="flex gap-2">
             <input
@@ -183,7 +192,7 @@ export function ProfilePage() {
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-1 mx-4 mt-5 p-1 bg-bg-card rounded-2xl border border-white/10">
+      <div className="flex gap-1 mx-4 mt-5 p-1 premium-card rounded-2xl">
         {(['stats', 'inventory', 'history'] as const).map((tab) => (
           <button
             key={tab}
@@ -208,7 +217,7 @@ export function ProfilePage() {
             { label: '👥 Рефералов', value: user._count.referrals },
             { label: '🔥 Серия входов', value: user.dailyStreak },
           ].map(({ label, value }) => (
-            <div key={label} className="flex items-center justify-between bg-bg-card rounded-xl p-4 border border-white/5">
+            <div key={label} className="flex items-center justify-between premium-card rounded-xl p-4">
               <span className="text-text-secondary text-sm">{label}</span>
               <span className="font-bold text-text-primary">{value}</span>
             </div>

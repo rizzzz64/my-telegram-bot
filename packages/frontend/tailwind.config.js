@@ -5,10 +5,10 @@ export default {
     extend: {
       colors: {
         bg: {
-          primary: '#0F0F1A',
-          secondary: '#161625',
-          card: '#1E1E32',
-          hover: '#252540',
+          primary: '#0A0A14',
+          secondary: '#12121F',
+          card: '#1A1A2E',
+          hover: '#22223A',
         },
         accent: {
           purple: '#8B5CF6',

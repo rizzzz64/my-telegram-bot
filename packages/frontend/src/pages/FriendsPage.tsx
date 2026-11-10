@@ -57,25 +57,28 @@ export function FriendsPage() {
       </div>
 
       {/* Referral Stats */}
-      <div className="flex gap-3 px-4 mb-6">
-        <div className="flex-1 bg-bg-card rounded-2xl p-4 border border-purple-500/20 text-center">
+      <div className="flex gap-3 px-4 mb-5">
+        <div className="flex-1 premium-card rounded-2xl p-4 text-center" style={{ border: '1px solid rgba(139,92,246,0.22)' }}>
           <div className="text-3xl font-bold text-accent-purple">{data.totalReferrals}</div>
           <p className="text-xs text-text-muted mt-1">Приглашено</p>
         </div>
-        <div className="flex-1 bg-bg-card rounded-2xl p-4 border border-pink-500/20 text-center">
+        <div className="flex-1 premium-card rounded-2xl p-4 text-center" style={{ border: '1px solid rgba(236,72,153,0.22)' }}>
           <div className="text-3xl font-bold text-pink-400">+100 🪙</div>
           <p className="text-xs text-text-muted mt-1">За каждого</p>
         </div>
       </div>
 
       {/* Invite Card */}
-      <div className="mx-4 mb-6 bg-gradient-to-br from-purple-900/40 to-blue-900/40 rounded-2xl p-5 border border-accent-purple/20">
+      <div
+        className="mx-4 mb-5 rounded-2xl p-5 relative overflow-hidden"
+        style={{ background: 'linear-gradient(145deg, rgba(109,40,217,0.25), rgba(37,99,235,0.2))', border: '1px solid rgba(139,92,246,0.22)' }}
+      >
         <h3 className="font-bold text-text-primary mb-1">🔗 Твоя реферальная ссылка</h3>
         <p className="text-text-muted text-sm mb-4">
           За каждого нового игрока ты получаешь <span className="text-yellow-400 font-bold">100 монет</span> и <span className="text-pink-400 font-bold">1 билет</span>!
         </p>
 
-        <div className="bg-bg-primary rounded-xl p-3 mb-4 flex items-center gap-2">
+        <div className="glass-card rounded-xl p-3 mb-4 flex items-center gap-2">
           <code className="text-xs text-accent-purple flex-1 truncate">{data.referralLink}</code>
         </div>
 
@@ -109,7 +112,7 @@ export function FriendsPage() {
             { step: '3', text: 'Ты получаешь 100 монет + 1 билет' },
             { step: '4', text: 'Друг получает 50 монет приветственный бонус' },
           ].map(({ step, text }) => (
-            <div key={step} className="flex items-center gap-3 bg-bg-card rounded-xl p-3 border border-white/5">
+            <div key={step} className="flex items-center gap-3 premium-card rounded-xl p-3">
               <div className="w-7 h-7 rounded-full bg-accent-purple/20 border border-accent-purple/40 flex items-center justify-center text-xs font-bold text-accent-purple flex-shrink-0">
                 {step}
               </div>
@@ -132,7 +135,7 @@ export function FriendsPage() {
         ) : (
           <div className="space-y-2">
             {data.referrals.map((ref) => (
-              <div key={ref.id} className="flex items-center gap-3 bg-bg-card rounded-xl p-3 border border-white/5">
+              <div key={ref.id} className="flex items-center gap-3 premium-card rounded-xl p-3">
                 <div className="w-10 h-10 rounded-full bg-bg-secondary flex items-center justify-center text-xl">
                   👤
                 </div>

@@ -44,12 +44,15 @@ function ContestCard({ contest, onSelect }: { contest: Contest; onSelect: () => 
 
   return (
     <motion.div
-      whileTap={{ scale: 0.98 }}
+      whileTap={{ scale: 0.97 }}
+      whileHover={{ y: -2 }}
       onClick={onSelect}
-      className="bg-bg-card rounded-2xl p-4 border border-white/10 cursor-pointer card-hover"
+      className="premium-card rounded-2xl p-4 cursor-pointer card-hover overflow-hidden relative"
     >
-      <div className="flex items-start gap-4">
-        <div className="w-16 h-16 bg-bg-secondary rounded-xl flex items-center justify-center text-4xl flex-shrink-0">
+      {/* Subtle left accent line */}
+      <div className="absolute left-0 top-3 bottom-3 w-0.5 rounded-full bg-gradient-to-b from-accent-purple to-accent-blue opacity-70" />
+      <div className="flex items-start gap-4 pl-3">
+        <div className="w-16 h-16 glass-card rounded-2xl flex items-center justify-center text-4xl flex-shrink-0">
           {contest.prizeEmoji}
         </div>
         <div className="flex-1 min-w-0">
@@ -68,17 +71,18 @@ function ContestCard({ contest, onSelect }: { contest: Contest; onSelect: () => 
         </div>
       </div>
 
-      <div className="mt-3">
-        <div className="flex justify-between text-xs text-text-muted mb-1">
-          <span>⏰ {timeLeft}</span>
-          <span>{contest._count.entries} / {contest.maxEntries} участников</span>
+      <div className="mt-3 pl-3">
+        <div className="flex justify-between text-xs text-text-muted mb-1.5">
+          <span className="text-cyan-400/90">⏰ {timeLeft}</span>
+          <span>{contest._count.entries} / {contest.maxEntries}</span>
         </div>
-        <div className="h-1.5 bg-bg-secondary rounded-full overflow-hidden">
+        <div className="h-1.5 bg-black/30 rounded-full overflow-hidden border border-white/5">
           <motion.div
-            className="h-full bg-gradient-to-r from-accent-purple to-accent-blue rounded-full"
+            className="h-full rounded-full"
+            style={{ background: 'linear-gradient(90deg, #7C3AED, #2563EB)' }}
             initial={{ width: 0 }}
             animate={{ width: `${fillPercent}%` }}
-            transition={{ duration: 0.8 }}
+            transition={{ duration: 0.9, ease: 'easeOut' }}
           />
         </div>
       </div>
@@ -157,22 +161,17 @@ export function ContestsPage() {
             </div>
 
             <div className="grid grid-cols-2 gap-3 mb-5">
-              <div className="bg-bg-secondary rounded-xl p-3 text-center">
-                <p className="text-xs text-text-muted">Приз</p>
-                <p className="font-bold text-yellow-400">🪙 {detail.prizeCoins.toLocaleString('ru-RU')}</p>
-              </div>
-              <div className="bg-bg-secondary rounded-xl p-3 text-center">
-                <p className="text-xs text-text-muted">Участников</p>
-                <p className="font-bold text-text-primary">{detail._count.entries} / {detail.maxEntries}</p>
-              </div>
-              <div className="bg-bg-secondary rounded-xl p-3 text-center">
-                <p className="text-xs text-text-muted">До конца</p>
-                <p className="font-bold text-cyan-400">{timeLeft}</p>
-              </div>
-              <div className="bg-bg-secondary rounded-xl p-3 text-center">
-                <p className="text-xs text-text-muted">Участие</p>
-                <p className="font-bold text-green-400">🆓 Бесплатно</p>
-              </div>
+              {[
+                { label: 'Приз', value: `🪙 ${detail.prizeCoins.toLocaleString('ru-RU')}`, color: 'text-yellow-400' },
+                { label: 'Участников', value: `${detail._count.entries} / ${detail.maxEntries}`, color: 'text-text-primary' },
+                { label: 'До конца', value: timeLeft, color: 'text-cyan-400' },
+                { label: 'Участие', value: '🆓 Бесплатно', color: 'text-emerald-400' },
+              ].map(({ label, value, color }) => (
+                <div key={label} className="glass-card rounded-xl p-3 text-center">
+                  <p className="text-xs text-text-muted">{label}</p>
+                  <p className={`font-bold text-sm mt-0.5 ${color}`}>{value}</p>
+                </div>
+              ))}
             </div>
 
             {detail.isEntered ? (

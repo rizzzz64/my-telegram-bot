@@ -90,7 +90,7 @@ export function CasesPage() {
   return (
     <div className="pb-nav">
       {/* Header */}
-      <div className="px-4 pt-2 pb-4">
+      <div className="px-4 pt-3 pb-3">
         <h1 className="text-2xl font-bold text-text-primary">🎁 Кейсы</h1>
         <p className="text-text-muted text-sm">Открой кейс и получи призы!</p>
       </div>
@@ -123,7 +123,7 @@ export function CasesPage() {
           <div className="p-5">
             <div className="flex items-center gap-4 mb-5">
               <div
-                className="w-20 h-20 rounded-2xl flex items-center justify-center text-5xl"
+                className="w-20 h-20 rounded-2xl flex items-center justify-center text-5xl relative overflow-hidden"
                 style={{ background: `${selectedCase.color}20`, border: `1px solid ${selectedCase.color}40` }}
               >
                 {selectedCase.imageEmoji}
@@ -315,37 +315,49 @@ function CaseCard({ caseItem, onSelect, userCoins, userTickets }: {
   return (
     <motion.button
       onClick={onSelect}
-      whileHover={{ scale: 1.03 }}
-      whileTap={{ scale: 0.97 }}
-      className="flex-shrink-0 w-40 rounded-2xl overflow-hidden border border-white/10 bg-bg-card card-hover text-left"
+      whileHover={{ scale: 1.04, y: -3 }}
+      whileTap={{ scale: 0.96 }}
+      transition={{ type: 'spring', damping: 20, stiffness: 350 }}
+      className="flex-shrink-0 w-40 rounded-3xl overflow-hidden text-left premium-card"
+      style={{ border: `1px solid ${caseItem.color}30` }}
     >
+      {/* Image area */}
       <div
-        className="h-28 flex items-center justify-center text-5xl relative"
-        style={{ background: `linear-gradient(135deg, ${caseItem.color}30, ${caseItem.color}10)` }}
+        className="h-32 flex items-center justify-center text-5xl relative overflow-hidden"
+        style={{ background: `linear-gradient(145deg, ${caseItem.color}28, ${caseItem.color}10)` }}
       >
+        {/* Glow behind emoji */}
+        <div
+          className="absolute inset-0 opacity-30"
+          style={{ background: `radial-gradient(circle at 50% 60%, ${caseItem.color}60, transparent 70%)` }}
+        />
         <motion.span
-          className="animate-float"
+          className="relative z-10"
           style={{ display: 'inline-block' }}
+          animate={{ y: [-3, 3, -3] }}
+          transition={{ duration: 2.8, repeat: Infinity, ease: 'easeInOut' }}
         >
           {caseItem.imageEmoji}
         </motion.span>
         {!canAfford && (
-          <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-            <span className="text-xs text-text-muted">Мало средств</span>
+          <div className="absolute inset-0 bg-black/55 flex items-center justify-center">
+            <span className="text-[10px] text-text-muted font-medium">Мало средств</span>
           </div>
         )}
       </div>
+
+      {/* Info */}
       <div className="p-3">
         <p className="text-sm font-bold text-text-primary truncate">{caseItem.name}</p>
-        <div className="flex items-center justify-between mt-1">
+        <div className="flex items-center justify-between mt-1.5">
           {caseItem.price === 0 ? (
-            <span className="text-xs font-bold text-green-400">Бесплатно!</span>
+            <span className="text-xs font-bold text-emerald-400">Бесплатно!</span>
           ) : (
             <span className="text-xs font-bold text-yellow-400">
               {caseItem.currency === 'coins' ? '🪙' : '🎟️'} {caseItem.price.toLocaleString('ru-RU')}
             </span>
           )}
-          <span className="text-xs text-text-muted">{caseItem.drops.length} 🎁</span>
+          <span className="text-[10px] text-text-muted">{caseItem.drops.length} призов</span>
         </div>
       </div>
     </motion.button>
