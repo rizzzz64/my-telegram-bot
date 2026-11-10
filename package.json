@@ -1,0 +1,26 @@
+{
+  "name": "giftforge",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "packages/backend",
+    "packages/frontend",
+    "packages/bot"
+  ],
+  "scripts": {
+    "dev": "concurrently \"npm run dev --workspace=packages/backend\" \"npm run dev --workspace=packages/frontend\"",
+    "dev:backend": "npm run dev --workspace=packages/backend",
+    "dev:frontend": "npm run dev --workspace=packages/frontend",
+    "dev:bot": "npm run dev --workspace=packages/bot",
+    "build": "npm run build --workspace=packages/backend && npm run build --workspace=packages/frontend",
+    "test": "npm run test --workspace=packages/backend",
+    "db:generate": "npm run db:generate --workspace=packages/backend",
+    "db:push": "npm run db:push --workspace=packages/backend",
+    "db:seed": "npm run db:seed --workspace=packages/backend",
+    "setup": "npm install && npm run db:generate && npm run db:push && npm run db:seed"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.0",
+    "typescript": "^5.7.2"
+  }
+}

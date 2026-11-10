@@ -1,0 +1,267 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id              Int      @id @default(autoincrement())
+  telegramId      String   @unique
+  username        String?
+  firstName       String
+  lastName        String?
+  coins           Int      @default(500)
+  tickets         Int      @default(3)
+  experience      Int      @default(0)
+  level           Int      @default(1)
+  rank            String   @default("bronze")
+  referralCode    String   @unique
+  referredById    Int?
+  referredBy      User?    @relation("Referrals", fields: [referredById], references: [id])
+  referrals       User[]   @relation("Referrals")
+  isAdmin         Boolean  @default(false)
+  isBanned        Boolean  @default(false)
+  lastDailyBonus  DateTime?
+  dailyStreak     Int      @default(0)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  inventory       UserItem[]
+  caseOpenings    CaseOpening[]
+  upgrades        Upgrade[]
+  crafts          Craft[]
+  promoUsages     PromoCodeUsage[]
+  contestEntries  ContestEntry[]
+  transactions    Transaction[]
+
+  @@map("users")
+}
+
+model Item {
+  id          Int      @id @default(autoincrement())
+  name        String
+  description String?
+  imageUrl    String?
+  rarity      String   @default("common")
+  category    String   @default("gift")
+  gameValue   Int      @default(100)
+  emoji       String   @default("🎁")
+  color       String   @default("#8B5CF6")
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+
+  userItems       UserItem[]
+  caseDrops       CaseDrop[]
+  upgradeTargets  Upgrade[]  @relation("UpgradeTarget")
+  craftResults    CraftRecipe[] @relation("CraftResult")
+  craftIngredients CraftIngredient[]
+
+  @@map("items")
+}
+
+model UserItem {
+  id          Int      @id @default(autoincrement())
+  userId      Int
+  itemId      Int
+  status      String   @default("active")
+  obtainedFrom String  @default("unknown")
+  createdAt   DateTime @default(now())
+
+  user        User     @relation(fields: [userId], references: [id])
+  item        Item     @relation(fields: [itemId], references: [id])
+
+  upgradeSource Upgrade[] @relation("UpgradeSource")
+  craftIngredientUses CraftIngredientUse[]
+
+  @@map("user_items")
+}
+
+model Case {
+  id          Int      @id @default(autoincrement())
+  name        String
+  description String?
+  imageEmoji  String   @default("📦")
+  color       String   @default("#8B5CF6")
+  category    String   @default("regular")
+  price       Int      @default(100)
+  currency    String   @default("coins")
+  isActive    Boolean  @default(true)
+  isLimited   Boolean  @default(false)
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+
+  drops       CaseDrop[]
+  openings    CaseOpening[]
+
+  @@map("cases")
+}
+
+model CaseDrop {
+  id          Int     @id @default(autoincrement())
+  caseId      Int
+  itemId      Int
+  chance      Int
+  case        Case    @relation(fields: [caseId], references: [id])
+  item        Item    @relation(fields: [itemId], references: [id])
+
+  @@map("case_drops")
+}
+
+model CaseOpening {
+  id          Int      @id @default(autoincrement())
+  userId      Int
+  caseId      Int
+  itemId      Int
+  createdAt   DateTime @default(now())
+
+  user        User     @relation(fields: [userId], references: [id])
+  case        Case     @relation(fields: [caseId], references: [id])
+
+  @@map("case_openings")
+}
+
+model Upgrade {
+  id            Int      @id @default(autoincrement())
+  userId        Int
+  sourceItemId  Int
+  targetItemId  Int
+  chance        Int
+  success       Boolean
+  createdAt     DateTime @default(now())
+
+  user          User     @relation(fields: [userId], references: [id])
+  sourceItem    UserItem @relation("UpgradeSource", fields: [sourceItemId], references: [id])
+  targetItem    Item     @relation("UpgradeTarget", fields: [targetItemId], references: [id])
+
+  @@map("upgrades")
+}
+
+model CraftRecipe {
+  id          Int      @id @default(autoincrement())
+  name        String
+  resultItemId Int
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+
+  resultItem  Item     @relation("CraftResult", fields: [resultItemId], references: [id])
+  ingredients CraftIngredient[]
+  crafts      Craft[]
+
+  @@map("craft_recipes")
+}
+
+model CraftIngredient {
+  id          Int     @id @default(autoincrement())
+  recipeId    Int
+  itemId      Int
+  quantity    Int     @default(1)
+
+  recipe      CraftRecipe @relation(fields: [recipeId], references: [id])
+  item        Item        @relation(fields: [itemId], references: [id])
+
+  @@map("craft_ingredients")
+}
+
+model Craft {
+  id          Int      @id @default(autoincrement())
+  userId      Int
+  recipeId    Int
+  success     Boolean  @default(true)
+  createdAt   DateTime @default(now())
+
+  user        User        @relation(fields: [userId], references: [id])
+  recipe      CraftRecipe @relation(fields: [recipeId], references: [id])
+  ingredientUses CraftIngredientUse[]
+
+  @@map("crafts")
+}
+
+model CraftIngredientUse {
+  id          Int     @id @default(autoincrement())
+  craftId     Int
+  userItemId  Int
+
+  craft       Craft    @relation(fields: [craftId], references: [id])
+  userItem    UserItem @relation(fields: [userItemId], references: [id])
+
+  @@map("craft_ingredient_uses")
+}
+
+model Contest {
+  id          Int      @id @default(autoincrement())
+  name        String
+  description String?
+  prizeEmoji  String   @default("🏆")
+  prizeItemId Int?
+  prizeCoins  Int      @default(0)
+  maxEntries  Int      @default(100)
+  endsAt      DateTime
+  isActive    Boolean  @default(true)
+  winnerId    Int?
+  drawnAt     DateTime?
+  createdAt   DateTime @default(now())
+
+  entries     ContestEntry[]
+
+  @@map("contests")
+}
+
+model ContestEntry {
+  id          Int      @id @default(autoincrement())
+  contestId   Int
+  userId      Int
+  createdAt   DateTime @default(now())
+
+  contest     Contest  @relation(fields: [contestId], references: [id])
+  user        User     @relation(fields: [userId], references: [id])
+
+  @@unique([contestId, userId])
+  @@map("contest_entries")
+}
+
+model PromoCode {
+  id              Int      @id @default(autoincrement())
+  code            String   @unique
+  rewardType      String
+  rewardAmount    Int      @default(0)
+  rewardItemId    Int?
+  maxUses         Int      @default(1)
+  usedCount       Int      @default(0)
+  expiresAt       DateTime?
+  isActive        Boolean  @default(true)
+  createdAt       DateTime @default(now())
+
+  usages          PromoCodeUsage[]
+
+  @@map("promo_codes")
+}
+
+model PromoCodeUsage {
+  id          Int      @id @default(autoincrement())
+  promoId     Int
+  userId      Int
+  createdAt   DateTime @default(now())
+
+  promo       PromoCode @relation(fields: [promoId], references: [id])
+  user        User      @relation(fields: [userId], references: [id])
+
+  @@unique([promoId, userId])
+  @@map("promo_code_usages")
+}
+
+model Transaction {
+  id          Int      @id @default(autoincrement())
+  userId      Int
+  type        String
+  amount      Int
+  currency    String   @default("coins")
+  description String
+  createdAt   DateTime @default(now())
+
+  user        User     @relation(fields: [userId], references: [id])
+
+  @@map("transactions")
+}
