@@ -1,0 +1,925 @@
+{
+  "schema_version": 1,
+  "purpose": "draft configuration for real Telegram gifts; not automatically publishable",
+  "market_reference_date": "2026-11-11",
+  "pricing_assumptions": {
+    "ton_to_stars_for_budgeting": 110,
+    "assumed_avg_regular_gift_cost_stars": 50,
+    "target_expected_prize_cost_fraction": 0.7,
+    "note": "Budgeting assumptions only, not actual Telegram conversion or guaranteed profitability. All prices require validation against real procurement, fee schedules, rights and regulations."
+  },
+  "cases": [
+    {
+      "id": "plushie-pepe",
+      "name": "Plushie Pepe",
+      "proposed_price_stars": 4000,
+      "enabled": false,
+      "requires_stock_check": true,
+      "needs_legal_review": true,
+      "market_cost_estimate_ton": 24.627,
+      "odds_total_bp": 10000,
+      "drops": [
+        {
+          "name": "Teddy Bear",
+          "kind": "regular_gift",
+          "chance_bp": 5000
+        },
+        {
+          "name": "Love Heart",
+          "kind": "regular_gift",
+          "chance_bp": 2500
+        },
+        {
+          "name": "Kissed Frog",
+          "kind": "collectible_gift",
+          "chance_bp": 2000,
+          "floor_ton_reference": 51
+        },
+        {
+          "name": "Precious Peach",
+          "kind": "collectible_gift",
+          "chance_bp": 499,
+          "floor_ton_reference": 275
+        },
+        {
+          "name": "Plush Pepe",
+          "kind": "collectible_gift",
+          "chance_bp": 1,
+          "floor_ton_reference": 7050
+        }
+      ]
+    },
+    {
+      "id": "durov-street",
+      "name": "Durov Street",
+      "proposed_price_stars": 290,
+      "enabled": false,
+      "requires_stock_check": true,
+      "needs_legal_review": true,
+      "market_cost_estimate_ton": 1.448,
+      "odds_total_bp": 10000,
+      "drops": [
+        {
+          "name": "Gift Box",
+          "kind": "regular_gift",
+          "chance_bp": 5500
+        },
+        {
+          "name": "Gem",
+          "kind": "regular_gift",
+          "chance_bp": 3000
+        },
+        {
+          "name": "Bow Tie",
+          "kind": "collectible_gift",
+          "chance_bp": 1200,
+          "floor_ton_reference": 6
+        },
+        {
+          "name": "Top Hat",
+          "kind": "collectible_gift",
+          "chance_bp": 290,
+          "floor_ton_reference": 10.4
+        },
+        {
+          "name": "Durov’s Cap",
+          "kind": "collectible_gift",
+          "chance_bp": 10,
+          "floor_ton_reference": 426
+        }
+      ]
+    },
+    {
+      "id": "premium-crown",
+      "name": "Premium Crown",
+      "proposed_price_stars": 1950,
+      "enabled": false,
+      "requires_stock_check": true,
+      "needs_legal_review": true,
+      "market_cost_estimate_ton": 11.949,
+      "odds_total_bp": 10000,
+      "drops": [
+        {
+          "name": "Gift Box",
+          "kind": "regular_gift",
+          "chance_bp": 5500
+        },
+        {
+          "name": "Trophy",
+          "kind": "regular_gift",
+          "chance_bp": 3000
+        },
+        {
+          "name": "Mini Oscar",
+          "kind": "collectible_gift",
+          "chance_bp": 1200,
+          "floor_ton_reference": 72
+        },
+        {
+          "name": "Gem Signet",
+          "kind": "collectible_gift",
+          "chance_bp": 290,
+          "floor_ton_reference": 65
+        },
+        {
+          "name": "Heart Locket",
+          "kind": "collectible_gift",
+          "chance_bp": 10,
+          "floor_ton_reference": 1424
+        }
+      ]
+    },
+    {
+      "id": "diamond-vault",
+      "name": "Diamond Vault",
+      "proposed_price_stars": 1650,
+      "enabled": false,
+      "requires_stock_check": true,
+      "needs_legal_review": true,
+      "market_cost_estimate_ton": 9.977,
+      "odds_total_bp": 10000,
+      "drops": [
+        {
+          "name": "Gem",
+          "kind": "regular_gift",
+          "chance_bp": 5500
+        },
+        {
+          "name": "Diamond Ring",
+          "kind": "regular_gift",
+          "chance_bp": 3000
+        },
+        {
+          "name": "Ion Gem",
+          "kind": "collectible_gift",
+          "chance_bp": 1200,
+          "floor_ton_reference": 73
+        },
+        {
+          "name": "Diamond Ring",
+          "kind": "collectible_gift",
+          "chance_bp": 290,
+          "floor_ton_reference": 37.6
+        },
+        {
+          "name": "Astral Shard",
+          "kind": "collectible_gift",
+          "chance_bp": 10,
+          "floor_ton_reference": 127
+        }
+      ]
+    },
+    {
+      "id": "scared-cat",
+      "name": "Scared Cat",
+      "proposed_price_stars": 460,
+      "enabled": false,
+      "requires_stock_check": true,
+      "needs_legal_review": true,
+      "market_cost_estimate_ton": 2.489,
+      "odds_total_bp": 10000,
+      "drops": [
+        {
+          "name": "Teddy Bear",
+          "kind": "regular_gift",
+          "chance_bp": 5500
+        },
+        {
+          "name": "Gift Box",
+          "kind": "regular_gift",
+          "chance_bp": 3000
+        },
+        {
+          "name": "Jelly Bunny",
+          "kind": "collectible_gift",
+          "chance_bp": 1200,
+          "floor_ton_reference": 9.5
+        },
+        {
+          "name": "Toy Bear",
+          "kind": "collectible_gift",
+          "chance_bp": 290,
+          "floor_ton_reference": 36.3
+        },
+        {
+          "name": "Scared Cat",
+          "kind": "collectible_gift",
+          "chance_bp": 10,
+          "floor_ton_reference": 296
+        }
+      ]
+    },
+    {
+      "id": "stellar-rocket",
+      "name": "Stellar Rocket",
+      "proposed_price_stars": 110,
+      "enabled": false,
+      "requires_stock_check": true,
+      "needs_legal_review": true,
+      "market_cost_estimate_ton": 0.258,
+      "odds_total_bp": 10000,
+      "drops": [
+        {
+          "name": "Rocket",
+          "kind": "regular_gift",
+          "chance_bp": 5500
+        },
+        {
+          "name": "Gem",
+          "kind": "regular_gift",
+          "chance_bp": 4000
+        },
+        {
+          "name": "Stellar Rocket",
+          "kind": "collectible_gift",
+          "chance_bp": 499,
+          "floor_ton_reference": 5.15
+        },
+        {
+          "name": "Light Sword",
+          "kind": "collectible_gift",
+          "chance_bp": 1,
+          "floor_ton_reference": 6.56
+        }
+      ]
+    },
+    {
+      "id": "neon-heart",
+      "name": "Neon Heart",
+      "proposed_price_stars": 480,
+      "enabled": false,
+      "requires_stock_check": true,
+      "needs_legal_review": true,
+      "market_cost_estimate_ton": 2.635,
+      "odds_total_bp": 10000,
+      "drops": [
+        {
+          "name": "Love Heart",
+          "kind": "regular_gift",
+          "chance_bp": 5500
+        },
+        {
+          "name": "Red Rose",
+          "kind": "regular_gift",
+          "chance_bp": 3000
+        },
+        {
+          "name": "Cookie Heart",
+          "kind": "collectible_gift",
+          "chance_bp": 1200,
+          "floor_ton_reference": 5.5
+        },
+        {
+          "name": "Trapped Heart",
+          "kind": "collectible_gift",
+          "chance_bp": 290,
+          "floor_ton_reference": 19
+        },
+        {
+          "name": "Heart Locket",
+          "kind": "collectible_gift",
+          "chance_bp": 10,
+          "floor_ton_reference": 1424
+        }
+      ]
+    },
+    {
+      "id": "mil-spec",
+      "name": "Mil-Spec",
+      "proposed_price_stars": 390,
+      "enabled": false,
+      "requires_stock_check": true,
+      "needs_legal_review": true,
+      "market_cost_estimate_ton": 2.091,
+      "odds_total_bp": 10000,
+      "drops": [
+        {
+          "name": "Trophy",
+          "kind": "regular_gift",
+          "chance_bp": 5500
+        },
+        {
+          "name": "Rocket",
+          "kind": "regular_gift",
+          "chance_bp": 3000
+        },
+        {
+          "name": "Victory Medal",
+          "kind": "collectible_gift",
+          "chance_bp": 1200,
+          "floor_ton_reference": 6
+        },
+        {
+          "name": "Neko Helmet",
+          "kind": "collectible_gift",
+          "chance_bp": 290,
+          "floor_ton_reference": 41
+        },
+        {
+          "name": "Heroic Helmet",
+          "kind": "collectible_gift",
+          "chance_bp": 10,
+          "floor_ton_reference": 182
+        }
+      ]
+    },
+    {
+      "id": "lucky-clover",
+      "name": "Lucky Clover",
+      "proposed_price_stars": 120,
+      "enabled": false,
+      "requires_stock_check": true,
+      "needs_legal_review": true,
+      "market_cost_estimate_ton": 0.276,
+      "odds_total_bp": 10000,
+      "drops": [
+        {
+          "name": "Gift Box",
+          "kind": "regular_gift",
+          "chance_bp": 5500
+        },
+        {
+          "name": "Red Rose",
+          "kind": "regular_gift",
+          "chance_bp": 4000
+        },
+        {
+          "name": "Clover Pin",
+          "kind": "collectible_gift",
+          "chance_bp": 499,
+          "floor_ton_reference": 5.5
+        },
+        {
+          "name": "Lucky Locket",
+          "kind": "collectible_gift",
+          "chance_bp": 1,
+          "floor_ton_reference": 15.18
+        }
+      ]
+    },
+    {
+      "id": "gift-box",
+      "name": "Gift Box",
+      "proposed_price_stars": 140,
+      "enabled": false,
+      "requires_stock_check": true,
+      "needs_legal_review": true,
+      "market_cost_estimate_ton": 0.448,
+      "odds_total_bp": 10000,
+      "drops": [
+        {
+          "name": "Gift Box",
+          "kind": "regular_gift",
+          "chance_bp": 5500
+        },
+        {
+          "name": "Birthday Cake",
+          "kind": "regular_gift",
+          "chance_bp": 4000
+        },
+        {
+          "name": "Joyful Bundle",
+          "kind": "collectible_gift",
+          "chance_bp": 499,
+          "floor_ton_reference": 8.69
+        },
+        {
+          "name": "Loot Bag",
+          "kind": "collectible_gift",
+          "chance_bp": 1,
+          "floor_ton_reference": 139
+        }
+      ]
+    },
+    {
+      "id": "meme-party",
+      "name": "Meme Party",
+      "proposed_price_stars": 230,
+      "enabled": false,
+      "requires_stock_check": true,
+      "needs_legal_review": true,
+      "market_cost_estimate_ton": 1.038,
+      "odds_total_bp": 10000,
+      "drops": [
+        {
+          "name": "Birthday Cake",
+          "kind": "regular_gift",
+          "chance_bp": 5500
+        },
+        {
+          "name": "Teddy Bear",
+          "kind": "regular_gift",
+          "chance_bp": 3000
+        },
+        {
+          "name": "Lol Pop",
+          "kind": "collectible_gift",
+          "chance_bp": 1200,
+          "floor_ton_reference": 4.25
+        },
+        {
+          "name": "Jolly Chimp",
+          "kind": "collectible_gift",
+          "chance_bp": 290,
+          "floor_ton_reference": 8
+        },
+        {
+          "name": "Scared Cat",
+          "kind": "collectible_gift",
+          "chance_bp": 10,
+          "floor_ton_reference": 296
+        }
+      ]
+    },
+    {
+      "id": "nft-prism",
+      "name": "NFT Prism",
+      "proposed_price_stars": 1800,
+      "enabled": false,
+      "requires_stock_check": true,
+      "needs_legal_review": true,
+      "market_cost_estimate_ton": 10.772,
+      "odds_total_bp": 10000,
+      "drops": [
+        {
+          "name": "Gem",
+          "kind": "regular_gift",
+          "chance_bp": 5500
+        },
+        {
+          "name": "Gift Box",
+          "kind": "regular_gift",
+          "chance_bp": 3000
+        },
+        {
+          "name": "Ion Gem",
+          "kind": "collectible_gift",
+          "chance_bp": 1200,
+          "floor_ton_reference": 73
+        },
+        {
+          "name": "Gem Signet",
+          "kind": "collectible_gift",
+          "chance_bp": 290,
+          "floor_ton_reference": 65
+        },
+        {
+          "name": "Astral Shard",
+          "kind": "collectible_gift",
+          "chance_bp": 10,
+          "floor_ton_reference": 127
+        }
+      ]
+    },
+    {
+      "id": "pepe-crystal",
+      "name": "Pepe Crystal",
+      "proposed_price_stars": 2300,
+      "enabled": false,
+      "requires_stock_check": true,
+      "needs_legal_review": true,
+      "market_cost_estimate_ton": 14.049,
+      "odds_total_bp": 10000,
+      "drops": [
+        {
+          "name": "Teddy Bear",
+          "kind": "regular_gift",
+          "chance_bp": 5000
+        },
+        {
+          "name": "Gem",
+          "kind": "regular_gift",
+          "chance_bp": 2500
+        },
+        {
+          "name": "Kissed Frog",
+          "kind": "collectible_gift",
+          "chance_bp": 2000,
+          "floor_ton_reference": 51
+        },
+        {
+          "name": "Magic Potion",
+          "kind": "collectible_gift",
+          "chance_bp": 499,
+          "floor_ton_reference": 63
+        },
+        {
+          "name": "Plush Pepe",
+          "kind": "collectible_gift",
+          "chance_bp": 1,
+          "floor_ton_reference": 7050
+        }
+      ]
+    },
+    {
+      "id": "golden-premium",
+      "name": "Golden Premium",
+      "proposed_price_stars": 3100,
+      "enabled": false,
+      "requires_stock_check": true,
+      "needs_legal_review": true,
+      "market_cost_estimate_ton": 18.951,
+      "odds_total_bp": 10000,
+      "drops": [
+        {
+          "name": "Trophy",
+          "kind": "regular_gift",
+          "chance_bp": 5000
+        },
+        {
+          "name": "Gem",
+          "kind": "regular_gift",
+          "chance_bp": 2500
+        },
+        {
+          "name": "Swiss Watch",
+          "kind": "collectible_gift",
+          "chance_bp": 2000,
+          "floor_ton_reference": 62
+        },
+        {
+          "name": "Nail Bracelet",
+          "kind": "collectible_gift",
+          "chance_bp": 499,
+          "floor_ton_reference": 131
+        },
+        {
+          "name": "Durov’s Glasses",
+          "kind": "collectible_gift",
+          "chance_bp": 1,
+          "floor_ton_reference": 143
+        }
+      ]
+    },
+    {
+      "id": "aqua-shark",
+      "name": "Aqua Shark",
+      "proposed_price_stars": 110,
+      "enabled": false,
+      "requires_stock_check": true,
+      "needs_legal_review": true,
+      "market_cost_estimate_ton": 0.25,
+      "odds_total_bp": 10000,
+      "drops": [
+        {
+          "name": "Rocket",
+          "kind": "regular_gift",
+          "chance_bp": 5500
+        },
+        {
+          "name": "Gem",
+          "kind": "regular_gift",
+          "chance_bp": 4000
+        },
+        {
+          "name": "Pool Float",
+          "kind": "collectible_gift",
+          "chance_bp": 499,
+          "floor_ton_reference": 5
+        },
+        {
+          "name": "Surge Board",
+          "kind": "collectible_gift",
+          "chance_bp": 1,
+          "floor_ton_reference": 8
+        }
+      ]
+    },
+    {
+      "id": "bunny-nft",
+      "name": "Bunny NFT",
+      "proposed_price_stars": 150,
+      "enabled": false,
+      "requires_stock_check": true,
+      "needs_legal_review": true,
+      "market_cost_estimate_ton": 0.475,
+      "odds_total_bp": 10000,
+      "drops": [
+        {
+          "name": "Teddy Bear",
+          "kind": "regular_gift",
+          "chance_bp": 5500
+        },
+        {
+          "name": "Gift Box",
+          "kind": "regular_gift",
+          "chance_bp": 4000
+        },
+        {
+          "name": "Jelly Bunny",
+          "kind": "collectible_gift",
+          "chance_bp": 499,
+          "floor_ton_reference": 9.5
+        },
+        {
+          "name": "Bunny Muffin",
+          "kind": "collectible_gift",
+          "chance_bp": 1,
+          "floor_ton_reference": 9
+        }
+      ]
+    },
+    {
+      "id": "space-doge",
+      "name": "Space Doge",
+      "proposed_price_stars": 120,
+      "enabled": false,
+      "requires_stock_check": true,
+      "needs_legal_review": true,
+      "market_cost_estimate_ton": 0.31,
+      "odds_total_bp": 10000,
+      "drops": [
+        {
+          "name": "Rocket",
+          "kind": "regular_gift",
+          "chance_bp": 5500
+        },
+        {
+          "name": "Birthday Cake",
+          "kind": "regular_gift",
+          "chance_bp": 4000
+        },
+        {
+          "name": "Stellar Rocket",
+          "kind": "collectible_gift",
+          "chance_bp": 499,
+          "floor_ton_reference": 5.15
+        },
+        {
+          "name": "Resistance Dog",
+          "kind": "collectible_gift",
+          "chance_bp": 1,
+          "floor_ton_reference": 533
+        }
+      ]
+    },
+    {
+      "id": "legendary-duck",
+      "name": "Legendary Duck",
+      "proposed_price_stars": 950,
+      "enabled": false,
+      "requires_stock_check": true,
+      "needs_legal_review": true,
+      "market_cost_estimate_ton": 5.493,
+      "odds_total_bp": 10000,
+      "drops": [
+        {
+          "name": "Trophy",
+          "kind": "regular_gift",
+          "chance_bp": 5000
+        },
+        {
+          "name": "Gift Box",
+          "kind": "regular_gift",
+          "chance_bp": 2500
+        },
+        {
+          "name": "Jolly Chimp",
+          "kind": "collectible_gift",
+          "chance_bp": 2000,
+          "floor_ton_reference": 8
+        },
+        {
+          "name": "Mini Oscar",
+          "kind": "collectible_gift",
+          "chance_bp": 499,
+          "floor_ton_reference": 72
+        },
+        {
+          "name": "Algorithm Cup",
+          "kind": "collectible_gift",
+          "chance_bp": 1,
+          "floor_ton_reference": 3000
+        }
+      ]
+    },
+    {
+      "id": "street-skull",
+      "name": "Street Skull",
+      "proposed_price_stars": 310,
+      "enabled": false,
+      "requires_stock_check": true,
+      "needs_legal_review": true,
+      "market_cost_estimate_ton": 1.534,
+      "odds_total_bp": 10000,
+      "drops": [
+        {
+          "name": "Gift Box",
+          "kind": "regular_gift",
+          "chance_bp": 5500
+        },
+        {
+          "name": "Gem",
+          "kind": "regular_gift",
+          "chance_bp": 4000
+        },
+        {
+          "name": "Electric Skull",
+          "kind": "collectible_gift",
+          "chance_bp": 499,
+          "floor_ton_reference": 30.5
+        },
+        {
+          "name": "Westside Sign",
+          "kind": "collectible_gift",
+          "chance_bp": 1,
+          "floor_ton_reference": 125
+        }
+      ]
+    },
+    {
+      "id": "love-frog",
+      "name": "Love Frog",
+      "proposed_price_stars": 1350,
+      "enabled": false,
+      "requires_stock_check": true,
+      "needs_legal_review": true,
+      "market_cost_estimate_ton": 8.037,
+      "odds_total_bp": 10000,
+      "drops": [
+        {
+          "name": "Love Heart",
+          "kind": "regular_gift",
+          "chance_bp": 5500
+        },
+        {
+          "name": "Red Rose",
+          "kind": "regular_gift",
+          "chance_bp": 3000
+        },
+        {
+          "name": "Kissed Frog",
+          "kind": "collectible_gift",
+          "chance_bp": 1200,
+          "floor_ton_reference": 51
+        },
+        {
+          "name": "Love Potion",
+          "kind": "collectible_gift",
+          "chance_bp": 290,
+          "floor_ton_reference": 17
+        },
+        {
+          "name": "Heart Locket",
+          "kind": "collectible_gift",
+          "chance_bp": 10,
+          "floor_ton_reference": 1424
+        }
+      ]
+    },
+    {
+      "id": "ice-bear",
+      "name": "Ice Bear",
+      "proposed_price_stars": 130,
+      "enabled": false,
+      "requires_stock_check": true,
+      "needs_legal_review": true,
+      "market_cost_estimate_ton": 0.383,
+      "odds_total_bp": 10000,
+      "drops": [
+        {
+          "name": "Teddy Bear",
+          "kind": "regular_gift",
+          "chance_bp": 5500
+        },
+        {
+          "name": "Gem",
+          "kind": "regular_gift",
+          "chance_bp": 4000
+        },
+        {
+          "name": "Snow Globe",
+          "kind": "collectible_gift",
+          "chance_bp": 499,
+          "floor_ton_reference": 7.6
+        },
+        {
+          "name": "Toy Bear",
+          "kind": "collectible_gift",
+          "chance_bp": 1,
+          "floor_ton_reference": 36.3
+        }
+      ]
+    },
+    {
+      "id": "dark-reaper",
+      "name": "Dark Reaper",
+      "proposed_price_stars": 460,
+      "enabled": false,
+      "requires_stock_check": true,
+      "needs_legal_review": true,
+      "market_cost_estimate_ton": 2.506,
+      "odds_total_bp": 10000,
+      "drops": [
+        {
+          "name": "Gift Box",
+          "kind": "regular_gift",
+          "chance_bp": 5500
+        },
+        {
+          "name": "Gem",
+          "kind": "regular_gift",
+          "chance_bp": 3000
+        },
+        {
+          "name": "Skull Flower",
+          "kind": "collectible_gift",
+          "chance_bp": 1200,
+          "floor_ton_reference": 12.35
+        },
+        {
+          "name": "Electric Skull",
+          "kind": "collectible_gift",
+          "chance_bp": 290,
+          "floor_ton_reference": 30.5
+        },
+        {
+          "name": "Loot Bag",
+          "kind": "collectible_gift",
+          "chance_bp": 10,
+          "floor_ton_reference": 139
+        }
+      ]
+    },
+    {
+      "id": "royal-cat",
+      "name": "Royal Cat",
+      "proposed_price_stars": 460,
+      "enabled": false,
+      "requires_stock_check": true,
+      "needs_legal_review": true,
+      "market_cost_estimate_ton": 2.489,
+      "odds_total_bp": 10000,
+      "drops": [
+        {
+          "name": "Teddy Bear",
+          "kind": "regular_gift",
+          "chance_bp": 5500
+        },
+        {
+          "name": "Trophy",
+          "kind": "regular_gift",
+          "chance_bp": 3000
+        },
+        {
+          "name": "Jelly Bunny",
+          "kind": "collectible_gift",
+          "chance_bp": 1200,
+          "floor_ton_reference": 9.5
+        },
+        {
+          "name": "Toy Bear",
+          "kind": "collectible_gift",
+          "chance_bp": 290,
+          "floor_ton_reference": 36.3
+        },
+        {
+          "name": "Scared Cat",
+          "kind": "collectible_gift",
+          "chance_bp": 10,
+          "floor_ton_reference": 296
+        }
+      ]
+    },
+    {
+      "id": "mystery-chest",
+      "name": "Mystery Chest",
+      "proposed_price_stars": 6000,
+      "enabled": false,
+      "requires_stock_check": true,
+      "needs_legal_review": true,
+      "market_cost_estimate_ton": 37.587,
+      "odds_total_bp": 10000,
+      "drops": [
+        {
+          "name": "Gift Box",
+          "kind": "regular_gift",
+          "chance_bp": 5000
+        },
+        {
+          "name": "Gem",
+          "kind": "regular_gift",
+          "chance_bp": 2500
+        },
+        {
+          "name": "Loot Bag",
+          "kind": "collectible_gift",
+          "chance_bp": 2000,
+          "floor_ton_reference": 139
+        },
+        {
+          "name": "Heroic Helmet",
+          "kind": "collectible_gift",
+          "chance_bp": 499,
+          "floor_ton_reference": 182
+        },
+        {
+          "name": "Plush Pepe",
+          "kind": "collectible_gift",
+          "chance_bp": 1,
+          "floor_ton_reference": 7050
+        }
+      ]
+    }
+  ]
+}

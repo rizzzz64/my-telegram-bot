@@ -30,20 +30,24 @@ interface Case {
 // Category display config
 const CATEGORIES: Record<string, { label: string; filterLabel: string; order: number }> = {
   free:      { label: 'Бесплатные',  filterLabel: 'Бесплатные', order: 0 },
-  daily:     { label: 'На сдачу',    filterLabel: 'На сдачу',   order: 1 },
-  referral:  { label: 'На сдачу',    filterLabel: 'На сдачу',   order: 1 },
-  regular:   { label: 'Средние',     filterLabel: 'Средние',    order: 2 },
-  rare:      { label: 'Дорогие',     filterLabel: 'Дорогие',    order: 3 },
-  premium:   { label: 'Премиум',     filterLabel: 'Премиум',    order: 4 },
-  legendary: { label: 'Премиум',     filterLabel: 'Премиум',    order: 4 },
-  vip:       { label: 'Эксклюзив',   filterLabel: 'Эксклюзив',  order: 5 },
-  allin:     { label: 'All-In',      filterLabel: 'All-In',     order: 6 },
+  daily:     { label: '⭐ До 200',    filterLabel: '⭐ До 200',   order: 1 },
+  referral:  { label: '⭐ До 200',    filterLabel: '⭐ До 200',   order: 1 },
+  regular:   { label: '⭐ Средние',   filterLabel: '⭐ Средние',  order: 2 },
+  rare:      { label: '⭐ Дорогие',   filterLabel: '⭐ Дорогие',  order: 3 },
+  premium:   { label: '⭐ Премиум',   filterLabel: '⭐ Премиум',  order: 4 },
+  legendary: { label: '⭐ Легенда',   filterLabel: '⭐ Легенда',  order: 5 },
+  vip:       { label: 'Эксклюзив',   filterLabel: 'Эксклюзив',  order: 6 },
+  allin:     { label: 'All-In',      filterLabel: 'All-In',     order: 7 },
 }
 
 const FILTER_ALL = 'Все'
 
 function formatPrice(price: number, currency: string) {
   if (price === 0) return 'Бесплатно'
+  if (currency === 'stars') {
+    if (price >= 1000) return `⭐ ${(price / 1000).toFixed(price >= 10000 ? 0 : 1)}K`
+    return `⭐ ${price.toLocaleString('ru-RU')}`
+  }
   const icon = currency === 'coins' ? '★' : '🎟️'
   if (price >= 1000) return `${icon} ${(price / 1000).toFixed(price >= 10000 ? 0 : 1)}K`
   return `${icon} ${price.toLocaleString('ru-RU')}`
@@ -237,18 +241,26 @@ export function CasesPage() {
               </div>
             )}
 
-            <motion.button
-              onClick={handleOpenCase}
-              whileTap={{ scale: 0.97 }}
-              disabled={
-                (selectedCase.currency === 'coins' && (user?.coins || 0) < selectedCase.price) ||
-                (selectedCase.currency === 'tickets' && (user?.tickets || 0) < selectedCase.price)
-              }
-              className="w-full py-4 rounded-2xl font-bold text-white text-lg btn-neon disabled:opacity-50"
-              style={{ background: selectedCase.price === 0 ? 'linear-gradient(135deg, #059669, #10B981)' : `linear-gradient(135deg, ${selectedCase.color}, ${selectedCase.color}99)` }}
-            >
-              {selectedCase.price === 0 ? '🎁 Открыть бесплатно!' : '🎁 Открыть кейс'}
-            </motion.button>
+            {selectedCase.currency === 'stars' ? (
+              <div className="w-full py-4 rounded-2xl font-bold text-center text-amber-400 text-base"
+                style={{ background: 'rgba(245,158,11,0.1)', border: '1px solid rgba(245,158,11,0.3)' }}>
+                ⭐ Оплата Stars — скоро
+                <div className="text-xs text-text-muted mt-0.5 font-normal">Интеграция Telegram Stars в разработке</div>
+              </div>
+            ) : (
+              <motion.button
+                onClick={handleOpenCase}
+                whileTap={{ scale: 0.97 }}
+                disabled={
+                  (selectedCase.currency === 'coins' && (user?.coins || 0) < selectedCase.price) ||
+                  (selectedCase.currency === 'tickets' && (user?.tickets || 0) < selectedCase.price)
+                }
+                className="w-full py-4 rounded-2xl font-bold text-white text-lg btn-neon disabled:opacity-50"
+                style={{ background: selectedCase.price === 0 ? 'linear-gradient(135deg, #059669, #10B981)' : `linear-gradient(135deg, ${selectedCase.color}, ${selectedCase.color}99)` }}
+              >
+                {selectedCase.price === 0 ? '🎁 Открыть бесплатно!' : '🎁 Открыть кейс'}
+              </motion.button>
+            )}
           </div>
         )}
       </Modal>

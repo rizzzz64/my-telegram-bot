@@ -51,6 +51,7 @@ model Item {
   emoji       String   @default("🎁")
   color       String   @default("#8B5CF6")
   isActive    Boolean  @default(true)
+  giftKind    String?
   createdAt   DateTime @default(now())
 
   userItems       UserItem[]
@@ -81,6 +82,7 @@ model UserItem {
 
 model Case {
   id          Int      @id @default(autoincrement())
+  slug        String?  @unique
   name        String
   description String?
   imageEmoji  String   @default("📦")
