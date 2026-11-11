@@ -162,20 +162,29 @@ bot.on('message:successful_payment', async (ctx) => {
 })
 
 bot.catch((err) => {
-  const e = err.error as any
-  // 409 Conflict = another instance running; exit so Render can retry cleanly
-  if (e?.error_code === 409) {
-    console.warn('⚠️  Bot 409 Conflict — another instance running. Waiting 15s then exiting...')
-    setTimeout(() => process.exit(0), 15000)
-    return
-  }
-  console.error('Bot error:', err)
+  console.error('Bot update error:', err)
 })
 
-console.log('\n🤖 GiftForge Bot запускается...')
-bot.start({
-  onStart: (info) => {
-    console.log(`✅ Бот @${info.username} запущен!`)
-    console.log(`🎮 Mini App: ${APP_URL}`)
+async function startBot(attempt = 1): Promise<void> {
+  console.log(`\n🤖 GiftForge Bot запускается... (попытка ${attempt})`)
+  try {
+    await bot.start({
+      onStart: (info) => {
+        console.log(`✅ Бот @${info.username} запущен!`)
+        console.log(`🎮 Mini App: ${APP_URL}`)
+      }
+    })
+  } catch (err: any) {
+    if (err?.error_code === 409) {
+      const delay = Math.min(attempt * 10, 60)
+      console.warn(`⚠️  Bot 409 Conflict — ещё один экземпляр работает. Повтор через ${delay}с...`)
+      await new Promise(r => setTimeout(r, delay * 1000))
+      return startBot(attempt + 1)
+    }
+    console.error('Bot fatal error:', err)
+    // Exit 0 so the backend web service stays marked as live
+    process.exit(0)
   }
-})
+}
+
+startBot()
