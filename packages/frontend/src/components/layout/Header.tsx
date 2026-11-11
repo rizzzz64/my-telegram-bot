@@ -1,55 +1,87 @@
 import { motion } from 'framer-motion'
 import { useUserStore } from '../../stores/userStore'
+import { useAppStore } from '../../stores/appStore'
+
+const ONLINE_COUNT = 42 // mock, replace with real websocket later
 
 export function Header() {
   const { user } = useUserStore()
+  const { setActiveTab } = useAppStore()
 
   if (!user) return null
 
-  const rankColors: Record<string, string> = {
-    bronze: 'text-amber-600',
-    silver: 'text-slate-400',
-    gold: 'text-yellow-400',
-    platinum: 'text-cyan-400',
-  }
-
-  const rankEmojis: Record<string, string> = {
-    bronze: '🥉', silver: '🥈', gold: '🥇', platinum: '💎'
-  }
+  const avatarEmoji = user.rank === 'platinum' ? '💎' : user.rank === 'gold' ? '👑' : user.rank === 'silver' ? '🌟' : '⭐'
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-30 bg-bg-primary/90 border-b border-white/5"
-      style={{ paddingTop: 'env(safe-area-inset-top, 0px)', backdropFilter: 'blur(12px)' }}>
-      <div className="flex items-center justify-between px-4 h-14">
+    <header
+      className="fixed top-0 left-0 right-0 z-30"
+      style={{
+        background: 'rgba(10,10,20,0.92)',
+        backdropFilter: 'blur(16px)',
+        WebkitBackdropFilter: 'blur(16px)',
+        borderBottom: '1px solid rgba(255,255,255,0.05)',
+        paddingTop: 'env(safe-area-inset-top, 0px)',
+      }}
+    >
+      <div className="flex items-center justify-between px-3 h-14">
+        {/* Left: Logo + Name + Online */}
         <div className="flex items-center gap-2">
-          <span className="text-2xl">🎁</span>
-          <div>
-            <div className="text-sm font-bold text-text-primary leading-none">
-              {user.firstName} {user.lastName || ''}
+          <div className="relative">
+            <div
+              className="w-9 h-9 rounded-xl flex items-center justify-center text-xl font-bold"
+              style={{ background: 'linear-gradient(135deg, #7C3AED, #2563EB)' }}
+            >
+              🎁
             </div>
-            <div className={`text-xs ${rankColors[user.rank] || 'text-text-muted'}`}>
-              {rankEmojis[user.rank] || '🎖️'} {user.rank.charAt(0).toUpperCase() + user.rank.slice(1)}
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-black text-white tracking-wide">GIFTFORGE</span>
+            <div
+              className="flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-bold"
+              style={{ background: 'rgba(16,185,129,0.15)', border: '1px solid rgba(16,185,129,0.3)' }}
+            >
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+              <span className="text-emerald-400">{ONLINE_COUNT}</span>
             </div>
           </div>
         </div>
 
-        <div className="flex items-center gap-3">
-          <motion.div
-            className="flex items-center gap-1.5 bg-bg-card px-3 py-1.5 rounded-full border border-yellow-500/20"
-            whileTap={{ scale: 0.95 }}
+        {/* Right: Balance + Add + Avatar */}
+        <div className="flex items-center gap-2">
+          {/* Stars/coins balance */}
+          <motion.button
+            whileTap={{ scale: 0.93 }}
+            onClick={() => setActiveTab('bonuses')}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full"
+            style={{ background: 'rgba(245,158,11,0.12)', border: '1px solid rgba(245,158,11,0.25)' }}
           >
-            <span className="text-sm">🪙</span>
+            <span className="text-sm">★</span>
             <span className="text-sm font-bold text-yellow-400">
-              {user.coins.toLocaleString('ru-RU')}
+              {user.coins >= 1000
+                ? (user.coins / 1000).toFixed(user.coins >= 10000 ? 0 : 1) + 'K'
+                : user.coins.toLocaleString('ru-RU')}
             </span>
-          </motion.div>
-          <motion.div
-            className="flex items-center gap-1.5 bg-bg-card px-3 py-1.5 rounded-full border border-pink-500/20"
-            whileTap={{ scale: 0.95 }}
+          </motion.button>
+
+          {/* Add coins button */}
+          <motion.button
+            whileTap={{ scale: 0.9 }}
+            onClick={() => setActiveTab('earnings')}
+            className="w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-lg"
+            style={{ background: 'linear-gradient(135deg, #7C3AED, #2563EB)' }}
           >
-            <span className="text-sm">🎟️</span>
-            <span className="text-sm font-bold text-pink-400">{user.tickets}</span>
-          </motion.div>
+            +
+          </motion.button>
+
+          {/* Avatar */}
+          <motion.button
+            whileTap={{ scale: 0.9 }}
+            onClick={() => setActiveTab('bonuses')}
+            className="w-8 h-8 rounded-full flex items-center justify-center text-base"
+            style={{ background: 'rgba(139,92,246,0.2)', border: '2px solid rgba(139,92,246,0.4)' }}
+          >
+            {avatarEmoji}
+          </motion.button>
         </div>
       </div>
     </header>

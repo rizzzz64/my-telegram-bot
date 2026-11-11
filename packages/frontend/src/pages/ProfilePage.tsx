@@ -199,9 +199,10 @@ export function ProfilePage() {
             onClick={() => setActiveTab(tab)}
             className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition-all ${
               activeTab === tab
-                ? 'bg-accent-purple text-white'
+                ? 'text-white'
                 : 'text-text-muted hover:text-text-primary'
             }`}
+            style={activeTab === tab ? { background: 'linear-gradient(135deg, #7C3AED, #2563EB)' } : {}}
           >
             {tab === 'stats' ? '📊 Статы' : tab === 'inventory' ? '🎒 Инвентарь' : '📜 История'}
           </button>

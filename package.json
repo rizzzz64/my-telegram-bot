@@ -17,7 +17,9 @@
     "db:generate": "npm run db:generate --workspace=packages/backend",
     "db:push": "npm run db:push --workspace=packages/backend",
     "db:seed": "npm run db:seed --workspace=packages/backend",
-    "setup": "npm install && npm run db:generate && npm run db:push && npm run db:seed"
+    "setup": "npm install && npm run db:generate && npm run db:push && npm run db:seed",
+    "build:all": "npm run build --workspace=packages/backend && npm run build --workspace=packages/bot",
+    "start:prod": "node packages/backend/dist/index.js & node packages/bot/dist/index.js"
   },
   "devDependencies": {
     "concurrently": "^9.1.0",

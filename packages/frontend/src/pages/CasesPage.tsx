@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { api } from '../utils/api'
 import { useUserStore } from '../stores/userStore'
@@ -23,23 +23,36 @@ interface Case {
   price: number
   currency: string
   drops: DropItem[]
+  isNew?: boolean
+  isLimited?: boolean
 }
 
-const categoryLabels: Record<string, string> = {
-  free: '🆓 Бесплатные',
-  daily: '📅 Ежедневные',
-  referral: '👥 Рефералы',
-  regular: '📦 Обычные',
-  rare: '💫 Редкие',
-  premium: '💎 Премиум',
-  legendary: '⭐ Легендарные',
-  vip: '👑 VIP',
-  allin: '🎰 All-In',
+// Category display config
+const CATEGORIES: Record<string, { label: string; filterLabel: string; order: number }> = {
+  free:      { label: 'Бесплатные',  filterLabel: 'Бесплатные', order: 0 },
+  daily:     { label: 'На сдачу',    filterLabel: 'На сдачу',   order: 1 },
+  referral:  { label: 'На сдачу',    filterLabel: 'На сдачу',   order: 1 },
+  regular:   { label: 'Средние',     filterLabel: 'Средние',    order: 2 },
+  rare:      { label: 'Дорогие',     filterLabel: 'Дорогие',    order: 3 },
+  premium:   { label: 'Премиум',     filterLabel: 'Премиум',    order: 4 },
+  legendary: { label: 'Премиум',     filterLabel: 'Премиум',    order: 4 },
+  vip:       { label: 'Эксклюзив',   filterLabel: 'Эксклюзив',  order: 5 },
+  allin:     { label: 'All-In',      filterLabel: 'All-In',     order: 6 },
+}
+
+const FILTER_ALL = 'Все'
+
+function formatPrice(price: number, currency: string) {
+  if (price === 0) return 'Бесплатно'
+  const icon = currency === 'coins' ? '★' : '🎟️'
+  if (price >= 1000) return `${icon} ${(price / 1000).toFixed(price >= 10000 ? 0 : 1)}K`
+  return `${icon} ${price.toLocaleString('ru-RU')}`
 }
 
 export function CasesPage() {
   const [cases, setCases] = useState<Case[]>([])
   const [loading, setLoading] = useState(true)
+  const [activeFilter, setActiveFilter] = useState(FILTER_ALL)
   const [selectedCase, setSelectedCase] = useState<Case | null>(null)
   const [opening, setOpening] = useState(false)
   const [openingResult, setOpeningResult] = useState<any>(null)
@@ -52,7 +65,30 @@ export function CasesPage() {
     api.get<Case[]>('/cases').then(setCases).finally(() => setLoading(false))
   }, [])
 
-  const categories = [...new Set(cases.map(c => c.category))]
+  // Unique filter chips derived from actual data
+  const filterChips = useMemo(() => {
+    const seen = new Set<string>()
+    const chips: string[] = [FILTER_ALL]
+    cases
+      .map(c => CATEGORIES[c.category]?.filterLabel || c.category)
+      .forEach(label => { if (!seen.has(label)) { seen.add(label); chips.push(label) } })
+    return chips
+  }, [cases])
+
+  // Cases grouped by display category, filtered
+  const grouped = useMemo(() => {
+    const filtered = activeFilter === FILTER_ALL
+      ? cases
+      : cases.filter(c => (CATEGORIES[c.category]?.filterLabel || c.category) === activeFilter)
+
+    const groups: Record<string, { label: string; order: number; cases: Case[] }> = {}
+    filtered.forEach(c => {
+      const cfg = CATEGORIES[c.category] || { label: c.category, order: 99 }
+      if (!groups[cfg.label]) groups[cfg.label] = { label: cfg.label, order: cfg.order, cases: [] }
+      groups[cfg.label].cases.push(c)
+    })
+    return Object.values(groups).sort((a, b) => a.order - b.order)
+  }, [cases, activeFilter])
 
   const handleOpenCase = async () => {
     if (!selectedCase || opening) return
@@ -81,41 +117,65 @@ export function CasesPage() {
     setSelectedCase(null)
   }
 
-  if (loading) return (
-    <div className="flex items-center justify-center h-64">
-      <LoadingSpinner size="lg" />
-    </div>
-  )
+  if (loading) return <div className="flex items-center justify-center h-64"><LoadingSpinner size="lg" /></div>
 
   return (
     <div className="pb-nav">
-      {/* Header */}
-      <div className="px-4 pt-3 pb-3">
-        <h1 className="text-2xl font-bold text-text-primary">🎁 Кейсы</h1>
-        <p className="text-text-muted text-sm">Открой кейс и получи призы!</p>
+      {/* Filter bar */}
+      <div className="sticky top-14 z-20 px-3 py-2.5" style={{ background: 'rgba(10,10,20,0.95)', backdropFilter: 'blur(12px)' }}>
+        <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide">
+          {/* Search icon */}
+          <button className="flex-shrink-0 w-9 h-9 rounded-full flex items-center justify-center text-text-muted"
+            style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.08)' }}>
+            🔍
+          </button>
+
+          {filterChips.map(chip => (
+            <motion.button
+              key={chip}
+              onClick={() => setActiveFilter(chip)}
+              whileTap={{ scale: 0.93 }}
+              className="flex-shrink-0 px-4 py-1.5 rounded-full text-sm font-semibold transition-colors duration-150"
+              style={activeFilter === chip
+                ? { background: '#7C3AED', color: '#fff', border: '1px solid #7C3AED' }
+                : { background: 'rgba(255,255,255,0.06)', color: '#94A3B8', border: '1px solid rgba(255,255,255,0.08)' }
+              }
+            >
+              {chip}
+            </motion.button>
+          ))}
+
+          {/* Sort icon */}
+          <button className="flex-shrink-0 w-9 h-9 rounded-full flex items-center justify-center text-text-muted ml-auto"
+            style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.08)' }}>
+            ↕
+          </button>
+        </div>
       </div>
 
-      {categories.map(cat => {
-        const catCases = cases.filter(c => c.category === cat)
-        return (
-          <div key={cat} className="mb-6">
-            <h2 className="text-sm font-semibold text-text-secondary px-4 mb-3">
-              {categoryLabels[cat] || cat}
-            </h2>
-            <div className="flex gap-3 px-4 overflow-x-auto pb-2 scrollbar-hide">
-              {catCases.map((caseItem) => (
-                <CaseCard
-                  key={caseItem.id}
-                  caseItem={caseItem}
-                  onSelect={() => setSelectedCase(caseItem)}
-                  userCoins={user?.coins || 0}
-                  userTickets={user?.tickets || 0}
-                />
-              ))}
-            </div>
+      {/* Cases grouped sections */}
+      <div className="px-3 pt-1 pb-4">
+        {grouped.length === 0 ? (
+          <div className="text-center py-16">
+            <div className="text-5xl mb-3">📦</div>
+            <p className="text-text-muted">Нет кейсов в этой категории</p>
           </div>
-        )
-      })}
+        ) : (
+          grouped.map(group => (
+            <div key={group.label} className="mb-5">
+              <div className="flex items-baseline justify-between mb-3">
+                <h2 className="text-2xl font-black text-white">{group.label}</h2>
+                <span className="text-sm text-text-muted">{group.cases.length} кейс{group.cases.length === 1 ? '' : group.cases.length < 5 ? 'а' : 'ов'}</span>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                {group.cases.map((c, idx) => (
+                  <CaseCard key={c.id} caseItem={c} index={idx} onSelect={() => setSelectedCase(c)} />
+                ))}
+              </div>
+            </div>
+          ))
+        )}
+      </div>
 
       {/* Case Detail Modal */}
       <Modal isOpen={!!selectedCase && !opening} onClose={() => setSelectedCase(null)} title={selectedCase?.name}>
@@ -123,10 +183,11 @@ export function CasesPage() {
           <div className="p-5">
             <div className="flex items-center gap-4 mb-5">
               <div
-                className="w-20 h-20 rounded-2xl flex items-center justify-center text-5xl relative overflow-hidden"
+                className="w-20 h-20 rounded-2xl flex items-center justify-center text-5xl relative overflow-hidden flex-shrink-0"
                 style={{ background: `${selectedCase.color}20`, border: `1px solid ${selectedCase.color}40` }}
               >
-                {selectedCase.imageEmoji}
+                <div className="absolute inset-0 opacity-30" style={{ background: `radial-gradient(circle, ${selectedCase.color}60, transparent 70%)` }} />
+                <span className="relative z-10">{selectedCase.imageEmoji}</span>
               </div>
               <div>
                 <p className="text-text-secondary text-sm mb-2">{selectedCase.description}</p>
@@ -134,12 +195,7 @@ export function CasesPage() {
                   {selectedCase.price === 0 ? (
                     <span className="text-green-400 font-bold text-lg">Бесплатно!</span>
                   ) : (
-                    <>
-                      <span className="text-2xl">{selectedCase.currency === 'coins' ? '🪙' : '🎟️'}</span>
-                      <span className="text-xl font-bold text-text-primary">
-                        {selectedCase.price.toLocaleString('ru-RU')}
-                      </span>
-                    </>
+                    <span className="text-xl font-bold text-yellow-400">{formatPrice(selectedCase.price, selectedCase.currency)}</span>
                   )}
                 </div>
               </div>
@@ -147,10 +203,9 @@ export function CasesPage() {
 
             <div className="mb-5">
               <h4 className="text-sm font-semibold text-text-secondary mb-3">Возможные призы:</h4>
-              <div className="space-y-2 max-h-64 overflow-y-auto">
-                {selectedCase.drops.map((drop) => (
-                  <div key={drop.item.id}
-                    className="flex items-center gap-3 bg-bg-secondary rounded-xl p-3">
+              <div className="space-y-2 max-h-56 overflow-y-auto">
+                {selectedCase.drops.map(drop => (
+                  <div key={drop.item.id} className="flex items-center gap-3 bg-bg-secondary rounded-xl p-3">
                     <span className="text-2xl">{drop.item.emoji}</span>
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium text-text-primary truncate">{drop.item.name}</p>
@@ -165,11 +220,10 @@ export function CasesPage() {
               </div>
             </div>
 
-            {/* Balance check */}
             {selectedCase.price > 0 && (
               <div className="bg-bg-secondary rounded-xl p-3 mb-4">
                 <div className="flex justify-between text-sm">
-                  <span className="text-text-secondary">Ваш баланс:</span>
+                  <span className="text-text-secondary">Твой баланс:</span>
                   <span className="font-bold text-text-primary">
                     {selectedCase.currency === 'coins'
                       ? `🪙 ${user?.coins?.toLocaleString('ru-RU')}`
@@ -190,39 +244,28 @@ export function CasesPage() {
                 (selectedCase.currency === 'coins' && (user?.coins || 0) < selectedCase.price) ||
                 (selectedCase.currency === 'tickets' && (user?.tickets || 0) < selectedCase.price)
               }
-              className="w-full py-4 rounded-2xl font-bold text-white text-lg btn-neon disabled:opacity-50 disabled:cursor-not-allowed"
-              style={{ background: `linear-gradient(135deg, ${selectedCase.color}, ${selectedCase.color}99)` }}
+              className="w-full py-4 rounded-2xl font-bold text-white text-lg btn-neon disabled:opacity-50"
+              style={{ background: selectedCase.price === 0 ? 'linear-gradient(135deg, #059669, #10B981)' : `linear-gradient(135deg, ${selectedCase.color}, ${selectedCase.color}99)` }}
             >
-              {selectedCase.price === 0 ? '🎁 Открыть бесплатно!' : `🎁 Открыть кейс`}
+              {selectedCase.price === 0 ? '🎁 Открыть бесплатно!' : '🎁 Открыть кейс'}
             </motion.button>
           </div>
         )}
       </Modal>
 
-      {/* Roulette Modal */}
+      {/* Roulette */}
       <AnimatePresence>
         {showRoulette && selectedCase && (
           <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
             className="fixed inset-0 z-50 bg-bg-primary flex flex-col items-center justify-center"
           >
-            <motion.div
-              initial={{ scale: 0.8, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              className="text-center mb-8"
-            >
+            <motion.div initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="text-center mb-8">
               <h2 className="text-2xl font-bold text-text-primary mb-1">Открываем кейс</h2>
               <p className="text-text-muted">{selectedCase.name}</p>
             </motion.div>
-
             {openingResult ? (
-              <CaseOpeningRoulette
-                drops={selectedCase.drops}
-                winnerItemId={openingResult.item.id}
-                onComplete={handleRouletteComplete}
-              />
+              <CaseOpeningRoulette drops={selectedCase.drops} winnerItemId={openingResult.item.id} onComplete={handleRouletteComplete} />
             ) : (
               <div className="flex items-center gap-3">
                 <LoadingSpinner size="lg" />
@@ -233,45 +276,30 @@ export function CasesPage() {
         )}
       </AnimatePresence>
 
-      {/* Win Result Modal */}
+      {/* Win result */}
       <AnimatePresence>
         {showResult && openingResult && (
           <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4 modal-backdrop"
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4"
           >
             <motion.div
-              initial={{ scale: 0.5, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.5, opacity: 0 }}
-              transition={{ type: 'spring', damping: 15 }}
+              initial={{ scale: 0.5, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.5, opacity: 0 }} transition={{ type: 'spring', damping: 15 }}
               className="bg-bg-card rounded-3xl p-8 max-w-sm w-full text-center border border-white/10"
               style={{ boxShadow: `0 0 60px ${openingResult.item.color}40` }}
             >
-              <motion.div
-                className="text-8xl mb-4"
-                animate={{ scale: [1, 1.1, 1], rotate: [0, -5, 5, 0] }}
+              <motion.div className="text-8xl mb-4"
+                animate={{ scale: [1, 1.12, 1], rotate: [0, -6, 6, 0] }}
                 transition={{ duration: 0.5, repeat: 2 }}
               >
                 {openingResult.item.emoji}
               </motion.div>
-
               <div className="mb-2">
-                <span className="text-xs text-accent-purple uppercase tracking-widest font-bold">
-                  🎊 Вы выиграли!
-                </span>
+                <span className="text-xs text-accent-purple uppercase tracking-widest font-bold">🎊 Поздравляем!</span>
               </div>
-
-              <h3 className="text-2xl font-bold text-text-primary mb-2">
-                {openingResult.item.name}
-              </h3>
-
-              <div className="flex justify-center mb-3">
-                <RarityBadge rarity={openingResult.item.rarity} />
-              </div>
-
+              <h3 className="text-2xl font-bold text-text-primary mb-2">{openingResult.item.name}</h3>
+              <div className="flex justify-center mb-4"><RarityBadge rarity={openingResult.item.rarity} /></div>
               <div className="bg-bg-secondary rounded-xl p-3 mb-6 flex justify-around">
                 <div>
                   <p className="text-xs text-text-muted">Ценность</p>
@@ -286,10 +314,8 @@ export function CasesPage() {
                   <p className="font-bold text-green-400">🪙 {openingResult.newBalance.coins.toLocaleString('ru-RU')}</p>
                 </div>
               </div>
-
               <motion.button
-                onClick={handleCloseResult}
-                whileTap={{ scale: 0.97 }}
+                onClick={handleCloseResult} whileTap={{ scale: 0.97 }}
                 className="w-full py-4 rounded-2xl font-bold text-white text-lg bg-gradient-to-r from-accent-purple to-accent-blue"
               >
                 🚀 Отлично!
@@ -302,63 +328,71 @@ export function CasesPage() {
   )
 }
 
-function CaseCard({ caseItem, onSelect, userCoins, userTickets }: {
-  caseItem: Case
-  onSelect: () => void
-  userCoins: number
-  userTickets: number
-}) {
-  const canAfford = caseItem.price === 0 ||
-    (caseItem.currency === 'coins' && userCoins >= caseItem.price) ||
-    (caseItem.currency === 'tickets' && userTickets >= caseItem.price)
+function CaseCard({ caseItem, index, onSelect }: { caseItem: Case; index: number; onSelect: () => void }) {
+  const isNew = caseItem.isNew ?? (caseItem.id % 3 === 0) // mock "new" badge
+  const isLimited = caseItem.isLimited ?? false
 
   return (
     <motion.button
       onClick={onSelect}
-      whileHover={{ scale: 1.04, y: -3 }}
-      whileTap={{ scale: 0.96 }}
-      transition={{ type: 'spring', damping: 20, stiffness: 350 }}
-      className="flex-shrink-0 w-40 rounded-3xl overflow-hidden text-left premium-card"
-      style={{ border: `1px solid ${caseItem.color}30` }}
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: index * 0.04, duration: 0.25 }}
+      whileTap={{ scale: 0.95 }}
+      className="rounded-2xl overflow-hidden text-left w-full"
+      style={{ background: 'rgba(22,22,40,0.9)', border: `1px solid ${caseItem.color}30` }}
     >
       {/* Image area */}
       <div
-        className="h-32 flex items-center justify-center text-5xl relative overflow-hidden"
-        style={{ background: `linear-gradient(145deg, ${caseItem.color}28, ${caseItem.color}10)` }}
+        className="relative flex items-center justify-center overflow-hidden"
+        style={{
+          height: '130px',
+          background: `linear-gradient(145deg, ${caseItem.color}22, ${caseItem.color}0a, #0A0A14)`,
+        }}
       >
-        {/* Glow behind emoji */}
-        <div
-          className="absolute inset-0 opacity-30"
-          style={{ background: `radial-gradient(circle at 50% 60%, ${caseItem.color}60, transparent 70%)` }}
-        />
+        {/* Radial glow */}
+        <div className="absolute inset-0 opacity-40"
+          style={{ background: `radial-gradient(ellipse at 50% 70%, ${caseItem.color}50, transparent 65%)` }} />
+
+        {/* New / Limited badge */}
+        {isLimited && (
+          <div className="absolute top-2 left-2 px-2 py-0.5 rounded-full text-[9px] font-black"
+            style={{ background: '#EF4444', color: '#fff' }}>
+            ЛИМИТ
+          </div>
+        )}
+        {isNew && !isLimited && (
+          <div className="absolute top-2 left-2 px-2 py-0.5 rounded-full text-[9px] font-black flex items-center gap-0.5"
+            style={{ background: 'rgba(16,185,129,0.9)', color: '#fff' }}>
+            ✦ НОВОЕ
+          </div>
+        )}
+
+        {/* Emoji with float animation */}
         <motion.span
-          className="relative z-10"
-          style={{ display: 'inline-block' }}
-          animate={{ y: [-3, 3, -3] }}
-          transition={{ duration: 2.8, repeat: Infinity, ease: 'easeInOut' }}
+          className="relative z-10 select-none"
+          style={{ fontSize: '64px', lineHeight: 1 }}
+          animate={{ y: [-4, 4, -4] }}
+          transition={{ duration: 2.5 + (index % 3) * 0.4, repeat: Infinity, ease: 'easeInOut' }}
         >
           {caseItem.imageEmoji}
         </motion.span>
-        {!canAfford && (
-          <div className="absolute inset-0 bg-black/55 flex items-center justify-center">
-            <span className="text-[10px] text-text-muted font-medium">Мало средств</span>
-          </div>
-        )}
       </div>
 
-      {/* Info */}
-      <div className="p-3">
-        <p className="text-sm font-bold text-text-primary truncate">{caseItem.name}</p>
-        <div className="flex items-center justify-between mt-1.5">
-          {caseItem.price === 0 ? (
-            <span className="text-xs font-bold text-emerald-400">Бесплатно!</span>
-          ) : (
-            <span className="text-xs font-bold text-yellow-400">
-              {caseItem.currency === 'coins' ? '🪙' : '🎟️'} {caseItem.price.toLocaleString('ru-RU')}
-            </span>
-          )}
-          <span className="text-[10px] text-text-muted">{caseItem.drops.length} призов</span>
-        </div>
+      {/* Info footer */}
+      <div className="px-3 pt-2 pb-3">
+        <p className="text-sm font-bold text-white truncate mb-2">{caseItem.name}</p>
+        {caseItem.price === 0 ? (
+          <div className="inline-block px-3 py-1 rounded-full text-xs font-black"
+            style={{ background: '#059669', color: '#fff' }}>
+            Бесплатно
+          </div>
+        ) : (
+          <div className="inline-block px-3 py-1 rounded-full text-xs font-black"
+            style={{ background: 'linear-gradient(135deg, #7C3AED, #2563EB)', color: '#fff' }}>
+            {formatPrice(caseItem.price, caseItem.currency)}
+          </div>
+        )}
       </div>
     </motion.button>
   )

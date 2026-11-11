@@ -7,10 +7,9 @@ import { Notification } from './components/ui/Notification'
 import { Header } from './components/layout/Header'
 import { BottomNav } from './components/layout/BottomNav'
 import { CasesPage } from './pages/CasesPage'
-import { ProfilePage } from './pages/ProfilePage'
-import { UpgradePage } from './pages/UpgradePage'
-import { ContestsPage } from './pages/ContestsPage'
+import { GamesPage } from './pages/GamesPage'
 import { FriendsPage } from './pages/FriendsPage'
+import { ProfilePage } from './pages/ProfilePage'
 
 const DEMO_MODE = import.meta.env.VITE_DEMO_MODE !== 'false'
 
@@ -36,15 +35,12 @@ export default function App() {
         <div className="text-5xl mb-4">❌</div>
         <h2 className="text-xl font-bold text-text-primary mb-2">Ошибка подключения</h2>
         <p className="text-text-muted text-sm mb-6 max-w-xs">{error}</p>
-        <button
-          onClick={() => fetchUser()}
-          className="bg-accent-purple text-white px-6 py-3 rounded-xl font-medium"
-        >
+        <button onClick={() => fetchUser()} className="bg-accent-purple text-white px-6 py-3 rounded-xl font-medium">
           Повторить
         </button>
         {DEMO_MODE && (
           <p className="text-text-muted text-xs mt-4">
-            Backend не запущен? Запусти: <code className="text-accent-purple">start.bat</code>
+            Backend не запущен? Запусти: <code className="text-accent-purple">npm run dev</code>
           </p>
         )}
       </div>
@@ -58,8 +54,9 @@ export default function App() {
       <Notification />
 
       {DEMO_MODE && (
-        <div className="bg-amber-500/10 border-b border-amber-500/20 px-4 py-2 text-center">
-          <p className="text-amber-400 text-xs">🔧 Демо-режим · Используй промокод WELCOME500 для монет</p>
+        <div className="bg-amber-500/10 border-b border-amber-500/20 px-4 py-1.5 text-center"
+          style={{ marginTop: 'env(safe-area-inset-top, 0px)' }}>
+          <p className="text-amber-400 text-xs">🔧 Демо · Промокод: WELCOME500</p>
         </div>
       )}
 
@@ -69,16 +66,15 @@ export default function App() {
         <AnimatePresence mode="wait">
           <motion.div
             key={activeTab}
-            initial={{ opacity: 0, x: 10 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -10 }}
-            transition={{ duration: 0.15 }}
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -6 }}
+            transition={{ duration: 0.14 }}
           >
-            {activeTab === 'cases' && <CasesPage />}
-            {activeTab === 'profile' && <ProfilePage />}
-            {activeTab === 'upgrade' && <UpgradePage />}
-            {activeTab === 'contests' && <ContestsPage />}
-            {activeTab === 'friends' && <FriendsPage />}
+            {activeTab === 'cases'    && <CasesPage />}
+            {activeTab === 'games'    && <GamesPage />}
+            {activeTab === 'earnings' && <FriendsPage />}
+            {activeTab === 'bonuses'  && <ProfilePage />}
           </motion.div>
         </AnimatePresence>
       </main>
