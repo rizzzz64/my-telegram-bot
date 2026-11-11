@@ -109,6 +109,58 @@ bot.on('callback_query:data', async (ctx) => {
   }
 })
 
+// Telegram Stars payment handlers
+bot.on('pre_checkout_query', async (ctx) => {
+  // Always approve the payment
+  await ctx.answerPreCheckoutQuery(true)
+})
+
+bot.on('message:successful_payment', async (ctx) => {
+  const payment = ctx.message.successful_payment
+  if (!payment) return
+
+  try {
+    const payloadStr = Buffer.from(payment.invoice_payload, 'base64').toString('utf-8')
+    const payload = JSON.parse(payloadStr) as { caseId: number; userId: number; telegramId: string }
+
+    const API_URL = process.env.API_URL || 'http://localhost:3001'
+    const internalSecret = (process.env.INTERNAL_SECRET || process.env.BOT_TOKEN?.slice(-16)) ?? ''
+
+    const res = await fetch(`${API_URL}/api/cases/${payload.caseId}/open-stars`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-internal-secret': internalSecret,
+      },
+      body: JSON.stringify({ userId: payload.userId }),
+    })
+
+    if (res.ok) {
+      const data = await res.json() as { item?: { name: string; emoji: string } }
+      const item = data.item
+      await ctx.reply(
+        `🎉 *Платёж получен!*\n\n` +
+        `Ты потратил *${payment.total_amount} ⭐* на открытие кейса.\n\n` +
+        (item ? `🎁 Выпало: *${item.emoji} ${item.name}*\n\n` : '') +
+        `Открой приложение, чтобы увидеть свой предмет!`,
+        {
+          parse_mode: 'Markdown',
+          reply_markup: new InlineKeyboard().webApp('🎁 Открыть GiftForge', APP_URL),
+        }
+      )
+    } else {
+      await ctx.reply('⭐ Оплата получена! Открой приложение, чтобы забрать приз.', {
+        reply_markup: new InlineKeyboard().webApp('🎁 Открыть GiftForge', APP_URL),
+      })
+    }
+  } catch (err) {
+    console.error('Stars payment processing error:', err)
+    await ctx.reply('⭐ Оплата получена! Открой приложение, чтобы забрать приз.', {
+      reply_markup: new InlineKeyboard().webApp('🎁 Открыть GiftForge', APP_URL),
+    })
+  }
+})
+
 bot.catch((err) => {
   console.error('Bot error:', err)
 })

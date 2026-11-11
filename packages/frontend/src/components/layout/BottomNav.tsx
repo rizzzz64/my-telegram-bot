@@ -1,15 +1,20 @@
 import { motion } from 'framer-motion'
 import { Tab, useAppStore } from '../../stores/appStore'
+import { useUserStore } from '../../stores/userStore'
 
-const tabs: Array<{ id: Tab; icon: string; label: string; badge?: string }> = [
+const BASE_TABS: Array<{ id: Tab; icon: string; label: string; badge?: string }> = [
   { id: 'games',    icon: '🎮', label: 'Игры'     },
   { id: 'cases',    icon: '📦', label: 'Кейсы',  badge: 'FREE' },
-  { id: 'earnings', icon: '💰', label: 'Заработок' },
-  { id: 'bonuses',  icon: '🎁', label: 'Бонусы'   },
+  { id: 'earnings', icon: '💰', label: 'Доходы' },
+  { id: 'bonuses',  icon: '🎁', label: 'Профиль'   },
 ]
 
 export function BottomNav() {
   const { activeTab, setActiveTab } = useAppStore()
+  const { user } = useUserStore()
+  const tabs = user?.isAdmin
+    ? [...BASE_TABS, { id: 'admin' as Tab, icon: '🛡️', label: 'Админ' }]
+    : BASE_TABS
 
   return (
     <nav

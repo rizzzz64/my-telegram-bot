@@ -97,6 +97,8 @@ export async function authMiddleware(request: FastifyRequest, reply: FastifyRepl
   const telegramId = String(telegramUser.id)
   let user = await prisma.user.findUnique({ where: { telegramId } })
 
+  const isAdminId = !!(process.env.ADMIN_TELEGRAM_ID && telegramId === process.env.ADMIN_TELEGRAM_ID)
+
   if (!user) {
     const refCode = 'REF' + crypto.randomBytes(5).toString('hex').toUpperCase()
     user = await prisma.user.create({
@@ -108,9 +110,12 @@ export async function authMiddleware(request: FastifyRequest, reply: FastifyRepl
         coins: 500,
         tickets: 3,
         referralCode: refCode,
-        isAdmin: telegramId === process.env.ADMIN_TELEGRAM_ID,
+        isAdmin: isAdminId,
       }
     })
+  } else if (isAdminId && !user.isAdmin) {
+    // Promote existing user to admin if they match ADMIN_TELEGRAM_ID
+    user = await prisma.user.update({ where: { id: user.id }, data: { isAdmin: true } })
   }
 
   if (user.isBanned) {

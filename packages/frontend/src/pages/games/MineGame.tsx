@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { useUserStore } from '../../stores/userStore'
 import { useAppStore } from '../../stores/appStore'
 import { sounds } from '../../utils/sounds'
+import { api } from '../../utils/api'
 
 type OreType = 'empty' | 'copper' | 'iron' | 'redstone' | 'lapis' | 'gold' | 'diamond' | 'emerald' | 'tnt' | 'workbench'
 type BlockState = 'hidden' | 'cracked' | 'revealed'
@@ -73,13 +74,28 @@ export function MineGame() {
 
   earnedRef.current = earned
 
-  const startGame = () => {
+  const startGame = async () => {
     if ((user?.coins || 0) < bet) { showNotification('Недостаточно монет', 'error'); return }
     sounds.button()
+    // Deduct bet optimistically
+    const curCoins = useUserStore.getState().user?.coins || 0
+    const curTickets = useUserStore.getState().user?.tickets || 0
+    useUserStore.getState().updateBalance(curCoins - bet, curTickets)
     const pk = genPickaxe()
     setPickaxe(pk); setPickHp(PICKAXE_CONFIG[pk].hp); setPickMaxHp(PICKAXE_CONFIG[pk].hp)
     setGrid(buildGrid()); setEarned(0); setMultiplier(1); setPlaying(true)
     showNotification(`⛏️ Кирка: ${PICKAXE_CONFIG[pk].label}`, 'info')
+    // Confirm bet deduction with backend
+    try {
+      await api.post('/games/mine/start', { bet })
+    } catch {
+      // If backend fails, refund and stop
+      const refundCoins = useUserStore.getState().user?.coins || 0
+      const refundTickets = useUserStore.getState().user?.tickets || 0
+      useUserStore.getState().updateBalance(refundCoins + bet, refundTickets)
+      setPlaying(false)
+      showNotification('Ошибка соединения, ставка возвращена', 'error')
+    }
   }
 
   const mine = useCallback((row: number, col: number) => {
@@ -149,9 +165,20 @@ export function MineGame() {
     })
   }, [playing, pickaxe, speed, multiplier, bet])
 
-  const collect = () => {
+  const collect = async () => {
     setPlaying(false)
-    if (earned > 0) { sounds.cashout(); showNotification(`✅ Собрано: +${earned} 🪙`, 'success') }
+    if (earned > 0) {
+      sounds.cashout()
+      showNotification(`✅ Собрано: +${earned} 🪙`, 'success')
+      // Credit earnings via API
+      try {
+        const res = await api.post<{ coins: number; tickets: number }>('/games/mine/collect', { earned })
+        useUserStore.getState().updateBalance(res.coins, res.tickets)
+        return
+      } catch {
+        // Fallback
+      }
+    }
     fetchUser()
   }
 

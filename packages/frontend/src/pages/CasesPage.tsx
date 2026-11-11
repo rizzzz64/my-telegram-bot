@@ -96,6 +96,33 @@ export function CasesPage() {
 
   const handleOpenCase = async () => {
     if (!selectedCase || opening) return
+
+    // Stars payment flow
+    if (selectedCase.currency === 'stars') {
+      const tg = (window as any).Telegram?.WebApp
+      if (!tg) {
+        showNotification('Откройте приложение через Telegram', 'error')
+        return
+      }
+      setOpening(true)
+      try {
+        const { url } = await api.post<{ url: string }>(`/cases/${selectedCase.id}/invoice`)
+        tg.openInvoice(url, (status: string) => {
+          setOpening(false)
+          if (status === 'paid') {
+            showNotification('⭐ Оплата прошла! Приз придёт в бот.', 'success')
+            setSelectedCase(null)
+          } else if (status === 'failed' || status === 'cancelled') {
+            showNotification('Оплата отменена', 'info')
+          }
+        })
+      } catch (err: any) {
+        setOpening(false)
+        showNotification(err.message || 'Ошибка создания платежа', 'error')
+      }
+      return
+    }
+
     setOpening(true)
     setShowRoulette(true)
     try {
@@ -242,11 +269,15 @@ export function CasesPage() {
             )}
 
             {selectedCase.currency === 'stars' ? (
-              <div className="w-full py-4 rounded-2xl font-bold text-center text-amber-400 text-base"
-                style={{ background: 'rgba(245,158,11,0.1)', border: '1px solid rgba(245,158,11,0.3)' }}>
-                ⭐ Оплата Stars — скоро
-                <div className="text-xs text-text-muted mt-0.5 font-normal">Интеграция Telegram Stars в разработке</div>
-              </div>
+              <motion.button
+                onClick={handleOpenCase}
+                disabled={opening}
+                whileTap={{ scale: 0.97 }}
+                className="w-full py-4 rounded-2xl font-black text-white text-lg disabled:opacity-60"
+                style={{ background: opening ? 'rgba(255,255,255,0.1)' : 'linear-gradient(135deg,#F59E0B,#EF4444)' }}
+              >
+                {opening ? '⏳ Открываем...' : `⭐ Оплатить ${selectedCase.price} Stars`}
+              </motion.button>
             ) : (
               <motion.button
                 onClick={handleOpenCase}
