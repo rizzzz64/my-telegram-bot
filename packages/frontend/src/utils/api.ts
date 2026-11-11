@@ -1,20 +1,18 @@
 const API_BASE = '/api'
-const DEMO_MODE = import.meta.env.VITE_DEMO_MODE !== 'false'
 
 function getHeaders(): Record<string, string> {
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
   }
 
-  if (DEMO_MODE) {
-    headers['x-demo-user-id'] = 'demo_user'
-    return headers
-  }
-
   const tg = (window as any).Telegram?.WebApp
   if (tg?.initData) {
     headers['x-telegram-init-data'] = tg.initData
+    return headers
   }
+
+  // Fallback to demo mode when not opened via Telegram
+  headers['x-demo-user-id'] = 'demo_user'
   return headers
 }
 
