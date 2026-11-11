@@ -1,5 +1,5 @@
-import React, { useState, useCallback, useRef } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { useState, useCallback, useRef } from 'react'
+import { motion } from 'framer-motion'
 import { useUserStore } from '../../stores/userStore'
 import { useAppStore } from '../../stores/appStore'
 import { sounds } from '../../utils/sounds'
@@ -10,8 +10,6 @@ type BlockState = 'hidden' | 'cracked' | 'revealed'
 type Pickaxe = 'stone' | 'iron' | 'diamond'
 
 interface Block { ore: OreType; hp: number; maxHp: number; state: BlockState }
-interface Strike { id: number; row: number; col: number }
-interface Impact { id: number; row: number; col: number }
 
 const ORE_CONFIG: Record<OreType, { emoji: string; value: number; label: string; rarity: number }> = {
   empty:     { emoji: '🪨', value: 0,   label: 'Камень',   rarity: 0  },
@@ -54,8 +52,6 @@ function buildGrid(): Block[][] {
   )
 }
 
-let strikeId = 0
-
 export function MineGame() {
   const { user, fetchUser } = useUserStore()
   const { showNotification } = useAppStore()
@@ -68,8 +64,6 @@ export function MineGame() {
   const [pickMaxHp, setPickMaxHp] = useState(100)
   const [earned, setEarned] = useState(0)
   const [speed, setSpeed] = useState(1)
-  const [strikes, setStrikes] = useState<Strike[]>([])
-  const [impacts, setImpacts] = useState<Impact[]>([])
   const earnedRef = useRef(0)
 
   earnedRef.current = earned
@@ -100,16 +94,6 @@ export function MineGame() {
 
   const mine = useCallback((row: number, col: number) => {
     if (!playing) return
-
-    // Show swinging pickaxe
-    const id = ++strikeId
-    setStrikes(s => [...s, { id, row, col }])
-    setTimeout(() => setStrikes(s => s.filter(x => x.id !== id)), 320)
-    // Show impact burst on block break or crack
-    const impId = id + 10000
-    setImpacts(s => [...s, { id: impId, row, col }])
-    setTimeout(() => setImpacts(s => s.filter(x => x.id !== impId)), 500)
-
     sounds.mine()
 
     setGrid(prev => {
@@ -293,65 +277,6 @@ export function MineGame() {
             })
           )}
 
-          {/* Minecraft-style pickaxe swing overlays */}
-          <AnimatePresence>
-            {strikes.map(s => {
-              const cellW = 100 / COLS
-              const cellH = 44
-              return (
-                <motion.div
-                  key={s.id}
-                  className="absolute pointer-events-none z-20 select-none"
-                  style={{
-                    left: `${s.col * cellW + cellW / 2}%`,
-                    top: s.row * cellH - 10,
-                    translateX: '-30%',
-                    transformOrigin: '30% 15%',
-                    fontSize: '36px',
-                    lineHeight: 1,
-                    filter: 'drop-shadow(0 0 8px rgba(255,255,200,0.9))',
-                  }}
-                  initial={{ rotate: -70, opacity: 1, scale: 1.4 }}
-                  animate={{ rotate: 30, opacity: [1, 1, 0.3, 0], scale: [1.4, 1.2, 1.0, 0.7] }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.28, ease: [0.2, 0, 0.8, 1] }}
-                >
-                  ⛏️
-                </motion.div>
-              )
-            })}
-          </AnimatePresence>
-
-          {/* Impact particles on block hit */}
-          <AnimatePresence>
-            {impacts.map(s => {
-              const cellW = 100 / COLS
-              const cellH = 44
-              const cx = s.col * cellW + cellW / 2
-              const cy = s.row * cellH + cellH / 2
-              return (
-                <React.Fragment key={s.id}>
-                  {[0,1,2,3,4,5].map(i => {
-                    const angle = (i / 6) * Math.PI * 2
-                    const dx = Math.cos(angle) * 18
-                    const dy = Math.sin(angle) * 14
-                    return (
-                      <motion.div key={i}
-                        className="absolute pointer-events-none z-30 rounded-full"
-                        style={{ left: `${cx}%`, top: cy, width: 5, height: 5,
-                          background: i % 2 === 0 ? '#78350F' : '#D97706',
-                          marginLeft: -2.5, marginTop: -2.5 }}
-                        initial={{ x: 0, y: 0, opacity: 1, scale: 1 }}
-                        animate={{ x: dx, y: dy, opacity: 0, scale: 0.3 }}
-                        exit={{ opacity: 0 }}
-                        transition={{ duration: 0.4, ease: 'easeOut' }}
-                      />
-                    )
-                  })}
-                </React.Fragment>
-              )
-            })}
-          </AnimatePresence>
         </div>
       </div>
 
