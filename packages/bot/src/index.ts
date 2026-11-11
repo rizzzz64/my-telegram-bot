@@ -162,6 +162,13 @@ bot.on('message:successful_payment', async (ctx) => {
 })
 
 bot.catch((err) => {
+  const e = err.error as any
+  // 409 Conflict = another instance running; exit so Render can retry cleanly
+  if (e?.error_code === 409) {
+    console.warn('⚠️  Bot 409 Conflict — another instance running. Waiting 15s then exiting...')
+    setTimeout(() => process.exit(0), 15000)
+    return
+  }
   console.error('Bot error:', err)
 })
 
