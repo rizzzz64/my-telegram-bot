@@ -1,6 +1,6 @@
 {
   "rewrites": [
-    { "source": "/api/:path*", "destination": "https://my-telegram-bot-production-e01f54aa.up.railway.app/api/:path*" },
+    { "source": "/api/:path*", "destination": "https://giftforge-467b.onrender.com/api/:path*" },
     { "source": "/(.*)", "destination": "/index.html" }
   ],
   "headers": [
