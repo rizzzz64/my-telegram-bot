@@ -52,7 +52,7 @@ app.get('/health', async () => ({
   timestamp: new Date().toISOString()
 }))
 
-const port = parseInt(process.env.API_PORT || '3001')
+const port = parseInt(process.env.PORT || process.env.API_PORT || '3001')
 try {
   await app.listen({ port, host: '0.0.0.0' })
   console.log(`\n🚀 GiftForge Backend запущен на http://localhost:${port}`)
