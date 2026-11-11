@@ -1,7 +1,7 @@
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { useUserStore } from './stores/userStore'
-import { useAppStore } from './stores/appStore'
+import { useAppStore, Tab } from './stores/appStore'
 import { PageLoader } from './components/ui/LoadingSpinner'
 import { Notification } from './components/ui/Notification'
 import { Header } from './components/layout/Header'
@@ -16,6 +16,10 @@ const DEMO_MODE = import.meta.env.VITE_DEMO_MODE !== 'false'
 export default function App() {
   const { user, loading, error, fetchUser } = useUserStore()
   const { activeTab } = useAppStore()
+  const TAB_ORDER: Tab[] = ['games', 'cases', 'earnings', 'bonuses']
+  const prevTabRef = useRef<Tab>('games')
+  const dir = TAB_ORDER.indexOf(activeTab) >= TAB_ORDER.indexOf(prevTabRef.current) ? 1 : -1
+  useEffect(() => { prevTabRef.current = activeTab }, [activeTab])
 
   useEffect(() => {
     const tg = (window as any).Telegram?.WebApp
@@ -63,13 +67,14 @@ export default function App() {
       <Header />
 
       <main className="flex-1 overflow-y-auto" style={{ marginTop: '56px' }}>
-        <AnimatePresence mode="wait">
+        <AnimatePresence mode="wait" custom={dir}>
           <motion.div
             key={activeTab}
-            initial={{ opacity: 0, y: 6 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -6 }}
-            transition={{ duration: 0.14 }}
+            custom={dir}
+            initial={{ opacity: 0, x: dir * 40 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: dir * -40 }}
+            transition={{ duration: 0.2, ease: 'easeOut' }}
           >
             {activeTab === 'cases'    && <CasesPage />}
             {activeTab === 'games'    && <GamesPage />}
