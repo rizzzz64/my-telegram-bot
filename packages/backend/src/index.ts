@@ -53,14 +53,14 @@ app.get('/health', async () => ({
   timestamp: new Date().toISOString()
 }))
 
-await importCases()
-
 const port = parseInt(process.env.PORT || process.env.API_PORT || '3001')
 try {
   await app.listen({ port, host: '0.0.0.0' })
   console.log(`\n🚀 GiftForge Backend запущен на http://localhost:${port}`)
   console.log(`📋 Режим: ${process.env.DEMO_MODE === 'true' ? 'DEMO' : 'PRODUCTION'}`)
   console.log(`💾 База данных: ${process.env.DATABASE_URL}`)
+  // Run after server is up so Render port scan succeeds first
+  importCases().catch(err => console.error('importCases error:', err))
 } catch (err) {
   app.log.error(err)
   process.exit(1)
