@@ -127,10 +127,6 @@ export async function caseRoutes(app: FastifyInstance) {
     })
     if (!caseData || !caseData.isActive) return reply.status(404).send({ error: 'Case not found' })
 
-    // Use openCase but it blocks on currency=stars; call directly
-    const { openCase: openCaseDirect } = await import('../services/caseService.js')
-    // Temporarily patch: open case skipping currency check is handled in openCase
-    // We set price=0 for the transaction by passing a free open
     try {
       // Record the opening without charge (payment already done via Stars)
       const result = await prisma.$transaction(async (tx) => {

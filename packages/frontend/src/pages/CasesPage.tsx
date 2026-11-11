@@ -245,7 +245,6 @@ export function CasesPage() {
                         <span className="text-xs text-text-muted">🪙 {drop.item.gameValue}</span>
                       </div>
                     </div>
-                    <span className="text-sm font-bold text-accent-purple">{drop.chance}%</span>
                   </div>
                 ))}
               </div>
