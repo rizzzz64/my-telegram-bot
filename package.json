@@ -19,7 +19,7 @@
     "db:seed": "npm run db:seed --workspace=packages/backend",
     "setup": "npm install && npm run db:generate && npm run db:push && npm run db:seed",
     "build:all": "npm run build --workspace=packages/backend && npm run build --workspace=packages/bot",
-    "start:prod": "npx prisma db push --schema=packages/backend/prisma/schema.prisma --accept-data-loss && node packages/backend/dist/index.js & node packages/bot/dist/index.js"
+    "start:prod": "cp packages/backend/prisma/schema.postgresql.prisma packages/backend/prisma/schema.prisma && npx prisma generate --schema=packages/backend/prisma/schema.prisma && npx prisma db push --schema=packages/backend/prisma/schema.prisma --accept-data-loss && node packages/backend/dist/index.js & node packages/bot/dist/index.js"
   },
   "devDependencies": {
     "concurrently": "^9.1.0",
