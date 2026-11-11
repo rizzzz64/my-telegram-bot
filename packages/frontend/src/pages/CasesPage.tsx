@@ -30,20 +30,24 @@ interface Case {
 // Category display config
 const CATEGORIES: Record<string, { label: string; filterLabel: string; order: number }> = {
   free:      { label: 'Бесплатные',  filterLabel: 'Бесплатные', order: 0 },
-  daily:     { label: 'На сдачу',    filterLabel: 'На сдачу',   order: 1 },
-  referral:  { label: 'На сдачу',    filterLabel: 'На сдачу',   order: 1 },
-  regular:   { label: 'Средние',     filterLabel: 'Средние',    order: 2 },
-  rare:      { label: 'Дорогие',     filterLabel: 'Дорогие',    order: 3 },
-  premium:   { label: 'Премиум',     filterLabel: 'Премиум',    order: 4 },
-  legendary: { label: 'Премиум',     filterLabel: 'Премиум',    order: 4 },
-  vip:       { label: 'Эксклюзив',   filterLabel: 'Эксклюзив',  order: 5 },
-  allin:     { label: 'All-In',      filterLabel: 'All-In',     order: 6 },
+  daily:     { label: '⭐ До 200',    filterLabel: '⭐ До 200',   order: 1 },
+  referral:  { label: '⭐ До 200',    filterLabel: '⭐ До 200',   order: 1 },
+  regular:   { label: '⭐ Средние',   filterLabel: '⭐ Средние',  order: 2 },
+  rare:      { label: '⭐ Дорогие',   filterLabel: '⭐ Дорогие',  order: 3 },
+  premium:   { label: '⭐ Премиум',   filterLabel: '⭐ Премиум',  order: 4 },
+  legendary: { label: '⭐ Легенда',   filterLabel: '⭐ Легенда',  order: 5 },
+  vip:       { label: 'Эксклюзив',   filterLabel: 'Эксклюзив',  order: 6 },
+  allin:     { label: 'All-In',      filterLabel: 'All-In',     order: 7 },
 }
 
 const FILTER_ALL = 'Все'
 
 function formatPrice(price: number, currency: string) {
   if (price === 0) return 'Бесплатно'
+  if (currency === 'stars') {
+    if (price >= 1000) return `⭐ ${(price / 1000).toFixed(price >= 10000 ? 0 : 1)}K`
+    return `⭐ ${price.toLocaleString('ru-RU')}`
+  }
   const icon = currency === 'coins' ? '★' : '🎟️'
   if (price >= 1000) return `${icon} ${(price / 1000).toFixed(price >= 10000 ? 0 : 1)}K`
   return `${icon} ${price.toLocaleString('ru-RU')}`
@@ -237,18 +241,26 @@ export function CasesPage() {
               </div>
             )}
 
-            <motion.button
-              onClick={handleOpenCase}
-              whileTap={{ scale: 0.97 }}
-              disabled={
-                (selectedCase.currency === 'coins' && (user?.coins || 0) < selectedCase.price) ||
-                (selectedCase.currency === 'tickets' && (user?.tickets || 0) < selectedCase.price)
-              }
-              className="w-full py-4 rounded-2xl font-bold text-white text-lg btn-neon disabled:opacity-50"
-              style={{ background: selectedCase.price === 0 ? 'linear-gradient(135deg, #059669, #10B981)' : `linear-gradient(135deg, ${selectedCase.color}, ${selectedCase.color}99)` }}
-            >
-              {selectedCase.price === 0 ? '🎁 Открыть бесплатно!' : '🎁 Открыть кейс'}
-            </motion.button>
+            {selectedCase.currency === 'stars' ? (
+              <div className="w-full py-4 rounded-2xl font-bold text-center text-amber-400 text-base"
+                style={{ background: 'rgba(245,158,11,0.1)', border: '1px solid rgba(245,158,11,0.3)' }}>
+                ⭐ Оплата Stars — скоро
+                <div className="text-xs text-text-muted mt-0.5 font-normal">Интеграция Telegram Stars в разработке</div>
+              </div>
+            ) : (
+              <motion.button
+                onClick={handleOpenCase}
+                whileTap={{ scale: 0.97 }}
+                disabled={
+                  (selectedCase.currency === 'coins' && (user?.coins || 0) < selectedCase.price) ||
+                  (selectedCase.currency === 'tickets' && (user?.tickets || 0) < selectedCase.price)
+                }
+                className="w-full py-4 rounded-2xl font-bold text-white text-lg btn-neon disabled:opacity-50"
+                style={{ background: selectedCase.price === 0 ? 'linear-gradient(135deg, #059669, #10B981)' : `linear-gradient(135deg, ${selectedCase.color}, ${selectedCase.color}99)` }}
+              >
+                {selectedCase.price === 0 ? '🎁 Открыть бесплатно!' : '🎁 Открыть кейс'}
+              </motion.button>
+            )}
           </div>
         )}
       </Modal>
@@ -329,68 +341,113 @@ export function CasesPage() {
 }
 
 function CaseCard({ caseItem, index, onSelect }: { caseItem: Case; index: number; onSelect: () => void }) {
-  const isNew = caseItem.isNew ?? (caseItem.id % 3 === 0) // mock "new" badge
+  const isNew = caseItem.isNew ?? (caseItem.id % 3 === 0)
   const isLimited = caseItem.isLimited ?? false
+  const [shimmer, setShimmer] = useState(false)
+
+  const handleTap = () => {
+    setShimmer(true)
+    setTimeout(() => setShimmer(false), 600)
+    onSelect()
+  }
 
   return (
     <motion.button
-      onClick={onSelect}
-      initial={{ opacity: 0, y: 12 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: index * 0.04, duration: 0.25 }}
-      whileTap={{ scale: 0.95 }}
-      className="rounded-2xl overflow-hidden text-left w-full"
-      style={{ background: 'rgba(22,22,40,0.9)', border: `1px solid ${caseItem.color}30` }}
+      onClick={handleTap}
+      initial={{ opacity: 0, y: 16, scale: 0.94 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      transition={{ delay: index * 0.055, duration: 0.3, type: 'spring', damping: 18 }}
+      whileTap={{ scale: 0.93 }}
+      className="rounded-2xl overflow-hidden text-left w-full relative"
+      style={{
+        background: `linear-gradient(160deg, ${caseItem.color}18 0%, #0d0d1a 60%)`,
+        border: `1px solid ${caseItem.color}50`,
+        boxShadow: `0 4px 24px ${caseItem.color}20, 0 0 0 1px ${caseItem.color}18 inset`,
+      }}
     >
       {/* Image area */}
       <div
         className="relative flex items-center justify-center overflow-hidden"
-        style={{
-          height: '130px',
-          background: `linear-gradient(145deg, ${caseItem.color}22, ${caseItem.color}0a, #0A0A14)`,
-        }}
+        style={{ height: '148px' }}
       >
-        {/* Radial glow */}
-        <div className="absolute inset-0 opacity-40"
-          style={{ background: `radial-gradient(ellipse at 50% 70%, ${caseItem.color}50, transparent 65%)` }} />
+        {/* Deep background gradient */}
+        <div className="absolute inset-0"
+          style={{ background: `linear-gradient(160deg, ${caseItem.color}30 0%, ${caseItem.color}08 50%, #05050f 100%)` }} />
+
+        {/* Strong bottom radial glow */}
+        <div className="absolute bottom-0 left-0 right-0"
+          style={{ height: '80%', background: `radial-gradient(ellipse at 50% 100%, ${caseItem.color}60 0%, transparent 70%)` }} />
+
+        {/* Shimmer sweep on tap */}
+        <AnimatePresence>
+          {shimmer && (
+            <motion.div
+              className="absolute inset-0 z-20 pointer-events-none"
+              initial={{ x: '-100%', skewX: -15, opacity: 0.6 }}
+              animate={{ x: '200%', opacity: 0.3 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.5, ease: 'easeOut' }}
+              style={{ background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent)', width: '60%' }}
+            />
+          )}
+        </AnimatePresence>
 
         {/* New / Limited badge */}
         {isLimited && (
-          <div className="absolute top-2 left-2 px-2 py-0.5 rounded-full text-[9px] font-black"
-            style={{ background: '#EF4444', color: '#fff' }}>
-            ЛИМИТ
-          </div>
+          <motion.div
+            className="absolute top-2 left-2 px-2.5 py-0.5 rounded-full text-[10px] font-black z-10 flex items-center gap-1"
+            animate={{ scale: [1, 1.08, 1] }}
+            transition={{ duration: 1.4, repeat: Infinity }}
+            style={{ background: 'linear-gradient(135deg, #DC2626, #EF4444)', color: '#fff',
+              boxShadow: '0 2px 8px rgba(239,68,68,0.5)' }}>
+            🔥 ЛИМИТ
+          </motion.div>
         )}
         {isNew && !isLimited && (
-          <div className="absolute top-2 left-2 px-2 py-0.5 rounded-full text-[9px] font-black flex items-center gap-0.5"
-            style={{ background: 'rgba(16,185,129,0.9)', color: '#fff' }}>
+          <div className="absolute top-2 left-2 px-2.5 py-0.5 rounded-full text-[10px] font-black z-10 flex items-center gap-0.5"
+            style={{ background: 'linear-gradient(135deg, #059669, #10B981)', color: '#fff',
+              boxShadow: '0 2px 8px rgba(16,185,129,0.5)' }}>
             ✦ НОВОЕ
           </div>
         )}
 
-        {/* Emoji with float animation */}
+        {/* Emoji with float + subtle rotation */}
         <motion.span
           className="relative z-10 select-none"
-          style={{ fontSize: '64px', lineHeight: 1 }}
-          animate={{ y: [-4, 4, -4] }}
-          transition={{ duration: 2.5 + (index % 3) * 0.4, repeat: Infinity, ease: 'easeInOut' }}
+          style={{ fontSize: '82px', lineHeight: 1,
+            filter: `drop-shadow(0 8px 20px ${caseItem.color}80) drop-shadow(0 0 12px ${caseItem.color}60)` }}
+          animate={{ y: [-5, 5, -5], rotate: [-2, 2, -2] }}
+          transition={{ duration: 2.6 + (index % 4) * 0.35, repeat: Infinity, ease: 'easeInOut' }}
         >
           {caseItem.imageEmoji}
         </motion.span>
+
+        {/* Sparkle stars */}
+        {[...Array(3)].map((_, i) => (
+          <motion.div key={i}
+            className="absolute z-10 text-xs pointer-events-none select-none"
+            style={{ left: `${25 + i * 25}%`, top: `${15 + i * 10}%`, opacity: 0.7 }}
+            animate={{ opacity: [0, 0.9, 0], scale: [0.5, 1.2, 0.5], y: [0, -6, 0] }}
+            transition={{ duration: 1.8 + i * 0.6, repeat: Infinity, delay: i * 0.7 }}>
+            ✦
+          </motion.div>
+        ))}
       </div>
 
       {/* Info footer */}
-      <div className="px-3 pt-2 pb-3">
-        <p className="text-sm font-bold text-white truncate mb-2">{caseItem.name}</p>
+      <div className="px-3 pt-2.5 pb-3">
+        <p className="text-sm font-bold text-white truncate mb-2.5 leading-tight">{caseItem.name}</p>
         {caseItem.price === 0 ? (
-          <div className="inline-block px-3 py-1 rounded-full text-xs font-black"
-            style={{ background: '#059669', color: '#fff' }}>
-            Бесплатно
+          <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-black"
+            style={{ background: 'linear-gradient(135deg, #065F46, #059669)',
+              boxShadow: '0 2px 10px rgba(5,150,105,0.4)', color: '#6EE7B7' }}>
+            🎁 Бесплатно
           </div>
         ) : (
-          <div className="inline-block px-3 py-1 rounded-full text-xs font-black"
-            style={{ background: 'linear-gradient(135deg, #7C3AED, #2563EB)', color: '#fff' }}>
-            {formatPrice(caseItem.price, caseItem.currency)}
+          <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-black"
+            style={{ background: `linear-gradient(135deg, ${caseItem.color}cc, ${caseItem.color}88)`,
+              boxShadow: `0 2px 10px ${caseItem.color}40`, color: '#fff' }}>
+            ⭐ {formatPrice(caseItem.price, caseItem.currency)}
           </div>
         )}
       </div>

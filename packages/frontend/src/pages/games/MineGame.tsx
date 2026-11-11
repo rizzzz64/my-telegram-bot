@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef } from 'react'
+import React, { useState, useCallback, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useUserStore } from '../../stores/userStore'
 import { useAppStore } from '../../stores/appStore'
@@ -10,6 +10,7 @@ type Pickaxe = 'stone' | 'iron' | 'diamond'
 
 interface Block { ore: OreType; hp: number; maxHp: number; state: BlockState }
 interface Strike { id: number; row: number; col: number }
+interface Impact { id: number; row: number; col: number }
 
 const ORE_CONFIG: Record<OreType, { emoji: string; value: number; label: string; rarity: number }> = {
   empty:     { emoji: '🪨', value: 0,   label: 'Камень',   rarity: 0  },
@@ -67,6 +68,7 @@ export function MineGame() {
   const [earned, setEarned] = useState(0)
   const [speed, setSpeed] = useState(1)
   const [strikes, setStrikes] = useState<Strike[]>([])
+  const [impacts, setImpacts] = useState<Impact[]>([])
   const earnedRef = useRef(0)
 
   earnedRef.current = earned
@@ -83,10 +85,14 @@ export function MineGame() {
   const mine = useCallback((row: number, col: number) => {
     if (!playing) return
 
-    // Show falling pickaxe
+    // Show swinging pickaxe
     const id = ++strikeId
     setStrikes(s => [...s, { id, row, col }])
-    setTimeout(() => setStrikes(s => s.filter(x => x.id !== id)), 350)
+    setTimeout(() => setStrikes(s => s.filter(x => x.id !== id)), 320)
+    // Show impact burst on block break or crack
+    const impId = id + 10000
+    setImpacts(s => [...s, { id: impId, row, col }])
+    setTimeout(() => setImpacts(s => s.filter(x => x.id !== impId)), 500)
 
     sounds.mine()
 
@@ -168,13 +174,28 @@ export function MineGame() {
       {playing && (
         <div className="flex gap-2 mb-3">
           <div className="flex-1 p-2 rounded-xl" style={{ background:'rgba(22,22,40,0.9)', border:'1px solid rgba(255,255,255,0.07)' }}>
-            <div className="flex items-center justify-between mb-1">
-              <span className="text-xs text-text-muted">{PICKAXE_CONFIG[pickaxe].emoji} {PICKAXE_CONFIG[pickaxe].label}</span>
-              <span className="text-xs font-bold text-red-400">❤️ {pickHp}/{pickMaxHp}</span>
+            <div className="flex items-center justify-between mb-1.5">
+              <span className="text-xs font-bold text-white">{PICKAXE_CONFIG[pickaxe].emoji} {PICKAXE_CONFIG[pickaxe].label}</span>
+              <span className="text-xs font-black"
+                style={{ color: pickHpPct > 60 ? '#4ADE80' : pickHpPct > 25 ? '#FACC15' : '#F87171' }}>
+                {pickHp}/{pickMaxHp}
+              </span>
             </div>
-            <div className="h-2 rounded-full overflow-hidden" style={{ background:'rgba(0,0,0,0.3)' }}>
-              <motion.div className="h-full rounded-full" animate={{ width:`${pickHpPct}%` }} transition={{ duration: 0.2 }}
-                style={{ background: pickHpPct > 50 ? '#EF4444' : '#F87171' }} />
+            {/* Minecraft-style segmented HP bar */}
+            <div className="flex gap-0.5 h-3">
+              {Array.from({ length: 20 }, (_, i) => {
+                const filled = (i / 20) * 100 < pickHpPct
+                return (
+                  <div key={i} className="flex-1 rounded-sm"
+                    style={{
+                      background: filled
+                        ? (pickHpPct > 60 ? '#4ADE80' : pickHpPct > 25 ? '#FACC15' : '#F87171')
+                        : 'rgba(255,255,255,0.08)',
+                      boxShadow: filled && pickHpPct > 60 ? '0 0 4px #4ADE8080' : undefined,
+                    }}
+                  />
+                )
+              })}
             </div>
           </div>
           <div className="px-3 py-2 rounded-xl flex flex-col items-center justify-center"
@@ -226,20 +247,26 @@ export function MineGame() {
                         {ORE_CONFIG[block.ore].emoji}
                       </motion.span>
                     : isCracked
-                      ? <span style={{ opacity:0.7 }}>🪨</span>
-                      : <span style={{ opacity:0.25, fontSize:10 }}>▪</span>
+                      ? <span style={{ opacity:0.8, fontSize:18 }}>🪨</span>
+                      : <span style={{ opacity:0.2, fontSize:9 }}>▪</span>
                   }
+                  {/* Crack overlay stages */}
                   {isCracked && (
-                    <div className="absolute inset-0 opacity-40" style={{
-                      background:'repeating-linear-gradient(45deg,transparent,transparent 3px,rgba(0,0,0,0.5) 3px,rgba(0,0,0,0.5) 6px)'
-                    }}/>
+                    <>
+                      <div className="absolute inset-0" style={{
+                        background:'repeating-linear-gradient(40deg,transparent,transparent 4px,rgba(0,0,0,0.6) 4px,rgba(0,0,0,0.6) 5px)'
+                      }}/>
+                      <div className="absolute inset-0" style={{
+                        background:'repeating-linear-gradient(-55deg,transparent,transparent 5px,rgba(0,0,0,0.3) 5px,rgba(0,0,0,0.3) 6px)'
+                      }}/>
+                    </>
                   )}
                 </motion.button>
               )
             })
           )}
 
-          {/* Falling pickaxe overlays */}
+          {/* Minecraft-style pickaxe swing overlays */}
           <AnimatePresence>
             {strikes.map(s => {
               const cellW = 100 / COLS
@@ -247,19 +274,54 @@ export function MineGame() {
               return (
                 <motion.div
                   key={s.id}
-                  className="absolute pointer-events-none text-2xl z-20 select-none"
+                  className="absolute pointer-events-none z-20 select-none"
                   style={{
-                    left: `${s.col * cellW + cellW/2}%`,
-                    top: s.row * cellH,
-                    transform: 'translateX(-50%)',
+                    left: `${s.col * cellW + cellW / 2}%`,
+                    top: s.row * cellH - 10,
+                    translateX: '-30%',
+                    transformOrigin: '30% 15%',
+                    fontSize: '36px',
+                    lineHeight: 1,
+                    filter: 'drop-shadow(0 0 8px rgba(255,255,200,0.9))',
                   }}
-                  initial={{ y: -30, opacity: 1, rotate: -45, scale: 1.2 }}
-                  animate={{ y: 0,   opacity: 0, rotate: 10,  scale: 0.6 }}
+                  initial={{ rotate: -70, opacity: 1, scale: 1.4 }}
+                  animate={{ rotate: 30, opacity: [1, 1, 0.3, 0], scale: [1.4, 1.2, 1.0, 0.7] }}
                   exit={{ opacity: 0 }}
-                  transition={{ duration: 0.28, ease: 'easeIn' }}
+                  transition={{ duration: 0.28, ease: [0.2, 0, 0.8, 1] }}
                 >
                   ⛏️
                 </motion.div>
+              )
+            })}
+          </AnimatePresence>
+
+          {/* Impact particles on block hit */}
+          <AnimatePresence>
+            {impacts.map(s => {
+              const cellW = 100 / COLS
+              const cellH = 44
+              const cx = s.col * cellW + cellW / 2
+              const cy = s.row * cellH + cellH / 2
+              return (
+                <React.Fragment key={s.id}>
+                  {[0,1,2,3,4,5].map(i => {
+                    const angle = (i / 6) * Math.PI * 2
+                    const dx = Math.cos(angle) * 18
+                    const dy = Math.sin(angle) * 14
+                    return (
+                      <motion.div key={i}
+                        className="absolute pointer-events-none z-30 rounded-full"
+                        style={{ left: `${cx}%`, top: cy, width: 5, height: 5,
+                          background: i % 2 === 0 ? '#78350F' : '#D97706',
+                          marginLeft: -2.5, marginTop: -2.5 }}
+                        initial={{ x: 0, y: 0, opacity: 1, scale: 1 }}
+                        animate={{ x: dx, y: dy, opacity: 0, scale: 0.3 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 0.4, ease: 'easeOut' }}
+                      />
+                    )
+                  })}
+                </React.Fragment>
               )
             })}
           </AnimatePresence>

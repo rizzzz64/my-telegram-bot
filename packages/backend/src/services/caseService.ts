@@ -25,6 +25,7 @@ export async function openCase(userId: number, caseId: number) {
     })
     if (!caseData || !caseData.isActive) throw new Error('Case not found or inactive')
     if (caseData.drops.length === 0) throw new Error('Case has no items configured')
+    if (caseData.currency === 'stars') throw new Error('Stars payment not yet enabled for this case')
 
     if (caseData.price > 0) {
       if (caseData.currency === 'coins') {

@@ -13,6 +13,7 @@ import { contestRoutes } from './routes/contests.js'
 import { referralRoutes } from './routes/referrals.js'
 import { promoRoutes } from './routes/promo.js'
 import { adminRoutes } from './routes/admin.js'
+import { importCases } from './db/importCases.js'
 
 const app = Fastify({
   logger: {
@@ -51,6 +52,8 @@ app.get('/health', async () => ({
   demo: process.env.DEMO_MODE === 'true',
   timestamp: new Date().toISOString()
 }))
+
+await importCases()
 
 const port = parseInt(process.env.PORT || process.env.API_PORT || '3001')
 try {
