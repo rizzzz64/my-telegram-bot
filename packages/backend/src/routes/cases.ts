@@ -71,37 +71,45 @@ export async function caseRoutes(app: FastifyInstance) {
 
     const payload = JSON.stringify({ caseId, userId: user.id, telegramId: user.telegramId })
 
+    // Telegram requires: title 1-32 chars, description 1-255, provider_token '' for Stars (XTR)
+    const title = caseData.name.slice(0, 32)
     const body = JSON.stringify({
-      title: caseData.name,
-      description: `Открытие кейса "${caseData.name}" в GiftForge`,
+      title,
+      description: `Открытие кейса "${title}" в GiftForge`.slice(0, 255),
       payload: Buffer.from(payload).toString('base64'),
+      provider_token: '',
       currency: 'XTR',
-      prices: [{ label: caseData.name, amount: caseData.price }],
+      prices: [{ label: title, amount: caseData.price }],
     })
 
-    const invoiceUrl = await new Promise<string>((resolve, reject) => {
-      const req = https.request({
-        hostname: 'api.telegram.org',
-        path: `/bot${botToken}/createInvoiceLink`,
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(body) },
-      }, res => {
-        let data = ''
-        res.on('data', chunk => { data += chunk })
-        res.on('end', () => {
-          try {
-            const json = JSON.parse(data)
-            if (json.ok) resolve(json.result)
-            else reject(new Error(json.description || 'Telegram API error'))
-          } catch (e) { reject(e) }
+    try {
+      const invoiceUrl = await new Promise<string>((resolve, reject) => {
+        const req = https.request({
+          hostname: 'api.telegram.org',
+          path: `/bot${botToken}/createInvoiceLink`,
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(body) },
+        }, res => {
+          let data = ''
+          res.on('data', chunk => { data += chunk })
+          res.on('end', () => {
+            try {
+              const json = JSON.parse(data)
+              if (json.ok) resolve(json.result)
+              else reject(new Error(json.description || 'Telegram API error'))
+            } catch (e) { reject(new Error('Invalid Telegram response: ' + data.slice(0, 200))) }
+          })
         })
+        req.on('error', reject)
+        req.write(body)
+        req.end()
       })
-      req.on('error', reject)
-      req.write(body)
-      req.end()
-    })
 
-    return reply.send({ url: invoiceUrl })
+      return reply.send({ url: invoiceUrl })
+    } catch (err: any) {
+      app.log.error({ err: err?.message }, 'createInvoiceLink failed')
+      return reply.status(400).send({ error: err?.message || 'Не удалось создать счёт на оплату' })
+    }
   })
 
   // Open a stars case after successful payment (called by bot after successful_payment)
