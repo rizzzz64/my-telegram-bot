@@ -1,10 +1,14 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
-import { useAppStore } from '../stores/appStore'
 import { UpgradePage } from './UpgradePage'
 import { ContestsPage } from './ContestsPage'
+import { SlotsGame } from './games/SlotsGame'
+import { CrashGame } from './games/CrashGame'
+import { RouletteGame } from './games/RouletteGame'
+import { MineGame } from './games/MineGame'
+import { ChickenGame } from './games/ChickenGame'
 
-type GameView = 'hub' | 'upgrade' | 'contests'
+type GameView = 'hub' | 'upgrade' | 'contests' | 'slots' | 'crash' | 'roulette' | 'mine' | 'chicken'
 
 const GAMES = [
   {
@@ -37,21 +41,19 @@ const GAMES = [
     players: 31,
     color: '#EC4899',
     gradient: 'linear-gradient(145deg, #4A0E2E, #2A0618)',
-    badge: 'СКОРО',
-    badgeColor: '#6B7280',
-    locked: true,
+    badge: 'НОВОЕ',
+    badgeColor: '#10B981',
   },
   {
     id: 'roulette',
     name: 'Рулетка',
-    desc: 'Шанс = доля в банке',
+    desc: 'Красное, чёрное или 0',
     emoji: '🎡',
     players: 19,
     color: '#06B6D4',
     gradient: 'linear-gradient(145deg, #032A30, #011518)',
-    badge: 'СКОРО',
-    badgeColor: '#6B7280',
-    locked: true,
+    badge: 'НОВОЕ',
+    badgeColor: '#10B981',
   },
   {
     id: 'crash',
@@ -61,9 +63,8 @@ const GAMES = [
     players: 44,
     color: '#10B981',
     gradient: 'linear-gradient(145deg, #022A1A, #011408)',
-    badge: 'СКОРО',
-    badgeColor: '#6B7280',
-    locked: true,
+    badge: 'НОВОЕ',
+    badgeColor: '#10B981',
   },
   {
     id: 'mine',
@@ -73,33 +74,46 @@ const GAMES = [
     players: 7,
     color: '#8B5CF6',
     gradient: 'linear-gradient(145deg, #1E0A45, #100520)',
-    badge: 'СКОРО',
-    badgeColor: '#6B7280',
-    locked: true,
+    badge: 'НОВОЕ',
+    badgeColor: '#10B981',
+  },
+  {
+    id: 'chicken',
+    name: 'Переход',
+    desc: 'Перейди дорогу · множитель растёт',
+    emoji: '🐥',
+    players: 23,
+    color: '#F59E0B',
+    gradient: 'linear-gradient(145deg, #3A2000, #1E1000)',
+    badge: 'НОВОЕ',
+    badgeColor: '#10B981',
   },
 ]
 
 export function GamesPage() {
   const [view, setView] = useState<GameView>('hub')
-  const { showNotification } = useAppStore()
 
-  if (view === 'upgrade') {
-    return (
-      <div>
-        <BackBar onBack={() => setView('hub')} title="Апгрейд" />
-        <UpgradePage />
-      </div>
-    )
-  }
-
-  if (view === 'contests') {
-    return (
-      <div>
-        <BackBar onBack={() => setView('hub')} title="Розыгрыши" />
-        <ContestsPage />
-      </div>
-    )
-  }
+  if (view === 'upgrade') return (
+    <div><BackBar onBack={() => setView('hub')} title="Апгрейд" /><UpgradePage /></div>
+  )
+  if (view === 'contests') return (
+    <div><BackBar onBack={() => setView('hub')} title="Розыгрыши" /><ContestsPage /></div>
+  )
+  if (view === 'slots') return (
+    <div><BackBar onBack={() => setView('hub')} title="Слоты" /><SlotsGame /></div>
+  )
+  if (view === 'crash') return (
+    <div><BackBar onBack={() => setView('hub')} title="Краш" /><CrashGame /></div>
+  )
+  if (view === 'roulette') return (
+    <div><BackBar onBack={() => setView('hub')} title="Рулетка" /><RouletteGame /></div>
+  )
+  if (view === 'mine') return (
+    <div><BackBar onBack={() => setView('hub')} title="Майнинг" /><MineGame /></div>
+  )
+  if (view === 'chicken') return (
+    <div><BackBar onBack={() => setView('hub')} title="Переход" /><ChickenGame /></div>
+  )
 
   return (
     <div className="pb-nav">
@@ -118,13 +132,7 @@ export function GamesPage() {
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: idx * 0.05 }}
             whileTap={{ scale: 0.95 }}
-            onClick={() => {
-              if (game.locked) {
-                showNotification('🚧 Скоро будет доступно!', 'info')
-                return
-              }
-              setView(game.id as GameView)
-            }}
+            onClick={() => setView(game.id as GameView)}
             className="rounded-2xl overflow-hidden text-left relative"
             style={{ background: game.gradient, border: `1px solid ${game.color}30` }}
           >
@@ -148,7 +156,7 @@ export function GamesPage() {
               <motion.span
                 className="select-none"
                 style={{ fontSize: '56px' }}
-                animate={!game.locked ? { y: [-3, 3, -3] } : {}}
+                animate={{ y: [-3, 3, -3] }}
                 transition={{ duration: 2.6 + idx * 0.3, repeat: Infinity, ease: 'easeInOut' }}
               >
                 {game.emoji}
@@ -161,16 +169,6 @@ export function GamesPage() {
               <p className="text-[11px] text-text-muted mt-0.5 leading-tight">{game.desc}</p>
             </div>
 
-            {/* Locked overlay */}
-            {game.locked && (
-              <div className="absolute inset-0 rounded-2xl flex items-center justify-center"
-                style={{ background: 'rgba(0,0,0,0.45)' }}>
-                <div className="text-center">
-                  <div className="text-2xl mb-1">🔒</div>
-                  <p className="text-xs text-text-muted font-bold">Скоро</p>
-                </div>
-              </div>
-            )}
           </motion.button>
         ))}
       </div>
