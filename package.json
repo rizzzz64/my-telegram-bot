@@ -24,6 +24,7 @@
     "start:prod": "npx prisma db push --schema=packages/backend/prisma/schema.prisma --accept-data-loss && node packages/backend/dist/index.js & node packages/bot/dist/index.js"
   },
   "devDependencies": {
+    "@types/node": "^22.10.1",
     "concurrently": "^9.1.0",
     "typescript": "^5.7.2"
   }
