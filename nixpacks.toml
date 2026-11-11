@@ -1,0 +1,8 @@
+[phases.build]
+cmds = [
+  "npm install",
+  "cp packages/backend/prisma/schema.postgresql.prisma packages/backend/prisma/schema.prisma",
+  "npx prisma generate --schema=packages/backend/prisma/schema.prisma",
+  "npm run build --workspace=packages/backend",
+  "npm run build --workspace=packages/bot"
+]
