@@ -4,7 +4,7 @@ services:
     env: node
     region: frankfurt
     plan: free
-    buildCommand: npm install --include=dev && cp packages/backend/prisma/schema.postgresql.prisma packages/backend/prisma/schema.prisma && npx prisma generate --schema=packages/backend/prisma/schema.prisma && npm run build --workspace=packages/backend && npm run build --workspace=packages/bot
+    buildCommand: npm install --include=dev && cp packages/backend/prisma/schema.postgresql.prisma packages/backend/prisma/schema.prisma && npx prisma generate --schema=packages/backend/prisma/schema.prisma && npm run build --workspace=packages/backend && npm run build --workspace=packages/bot && mkdir -p packages/backend/dist/db && cp packages/backend/src/db/cases-import.json packages/backend/dist/db/cases-import.json
     startCommand: npx prisma db push --schema=packages/backend/prisma/schema.prisma --accept-data-loss && node packages/backend/dist/index.js & node packages/bot/dist/index.js
     envVars:
       - key: NODE_ENV
