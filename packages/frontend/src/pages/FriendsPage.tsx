@@ -52,8 +52,8 @@ export function FriendsPage() {
   return (
     <div className="pb-nav">
       <div className="px-4 pt-2 pb-4">
-        <h1 className="text-2xl font-bold text-text-primary">👥 Друзья</h1>
-        <p className="text-text-muted text-sm">Приглашай друзей и получай награды!</p>
+        <h1 className="text-2xl font-black text-white">💰 Заработок</h1>
+        <p className="text-text-muted text-sm">Приглашай друзей и зарабатывай монеты</p>
       </div>
 
       {/* Referral Stats */}

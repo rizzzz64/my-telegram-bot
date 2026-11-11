@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 
-export type Tab = 'contests' | 'upgrade' | 'cases' | 'friends' | 'profile'
+export type Tab = 'games' | 'cases' | 'earnings' | 'bonuses'
 
 interface AppStore {
   activeTab: Tab
@@ -11,7 +11,7 @@ interface AppStore {
 }
 
 export const useAppStore = create<AppStore>((set) => ({
-  activeTab: 'cases',
+  activeTab: 'cases' as Tab,
   setActiveTab: (tab) => set({ activeTab: tab }),
   notification: null,
   showNotification: (message, type = 'info') => {
