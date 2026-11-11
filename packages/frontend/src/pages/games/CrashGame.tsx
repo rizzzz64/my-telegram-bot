@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { useUserStore } from '../../stores/userStore'
 import { useAppStore } from '../../stores/appStore'
 import { sounds } from '../../utils/sounds'
+import { api } from '../../utils/api'
 
 type Phase = 'waiting' | 'flying' | 'crashed' | 'cashedOut'
 
@@ -28,6 +29,7 @@ export function CrashGame() {
   const [history, setHistory] = useState<number[]>([3.21, 1.84, 12.5, 1.02, 7.3, 2.1, 1.0, 5.6, 1.5, 9.97])
   const [shake, setShake] = useState(false)
   const [pathPoints, setPathPoints] = useState<{x:number;y:number}[]>([])
+  const [apiPending, setApiPending] = useState(false)
 
   const crashPointRef = useRef(1.0)
   const rafRef = useRef<number | null>(null)
@@ -86,7 +88,7 @@ export function CrashGame() {
     rafRef.current = requestAnimationFrame(tick)
   }
 
-  const crash = useCallback(() => {
+  const crash = useCallback(async () => {
     if (rafRef.current) cancelAnimationFrame(rafRef.current)
     const finalMult = crashPointRef.current
     setMult(finalMult)
@@ -95,13 +97,21 @@ export function CrashGame() {
     setTimeout(() => setShake(false), 600)
     setHistory(h => [finalMult, ...h.slice(0, HISTORY_MAX - 1)])
     sounds.crash()
-    if (betPlacedRef.current) showNotification(`💥 Краш x${finalMult} — потеря ${bet} 🪙`, 'error')
+    if (betPlacedRef.current) {
+      showNotification(`💥 Краш x${finalMult} — потеря ${bet} 🪙`, 'error')
+      // Record loss via API (bet already deducted optimistically)
+      try {
+        await api.post('/games/crash', { bet, won: false, multiplier: finalMult })
+      } catch {
+        await fetchUser()
+      }
+    }
     setBetPlaced(false)
     setTimeout(() => setPhase('waiting'), 3500)
-  }, [bet])
+  }, [bet, fetchUser])
 
-  const cashOut = () => {
-    if (phase !== 'flying' || !betPlaced) return
+  const cashOut = async () => {
+    if (phase !== 'flying' || !betPlaced || apiPending) return
     if (rafRef.current) cancelAnimationFrame(rafRef.current)
     const m = mult
     setCashoutMult(m)
@@ -110,14 +120,28 @@ export function CrashGame() {
     const won = Math.round(bet * m)
     sounds.cashout()
     showNotification(`✅ Вышел x${m}! +${won} 🪙`, 'success')
-    fetchUser()
+    // Credit winnings via API
+    setApiPending(true)
+    try {
+      const res = await api.post<{ coins: number; tickets: number }>('/games/crash', { bet, won: true, multiplier: m })
+      useUserStore.getState().updateBalance(res.coins, res.tickets)
+    } catch {
+      // If API fails, still refresh user balance
+      await fetchUser()
+    } finally {
+      setApiPending(false)
+    }
     setTimeout(() => setPhase('waiting'), 2500)
   }
 
-  const placeBet = () => {
-    if (phase !== 'waiting' || betPlaced) return
+  const placeBet = async () => {
+    if (phase !== 'waiting' || betPlaced || apiPending) return
     if ((user?.coins || 0) < bet) { showNotification('Недостаточно монет', 'error'); return }
     sounds.bet()
+    // Optimistic UI update — deduct bet from display balance
+    const currentCoins = useUserStore.getState().user?.coins || 0
+    const currentTickets = useUserStore.getState().user?.tickets || 0
+    useUserStore.getState().updateBalance(currentCoins - bet, currentTickets)
     setBetPlaced(true)
     showNotification('✅ Ставка принята!', 'success')
   }

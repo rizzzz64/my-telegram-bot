@@ -7,18 +7,22 @@ export async function adminRoutes(app: FastifyInstance) {
   app.addHook('preHandler', adminMiddleware)
 
   app.get('/stats', async (request, reply) => {
-    const [userCount, itemCount, openingCount, totalCoins] = await Promise.all([
+    const now = new Date()
+    const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+    const [totalUsers, openingCount, totalCoins, newUsersToday] = await Promise.all([
       prisma.user.count(),
-      prisma.userItem.count({ where: { status: 'active' } }),
       prisma.caseOpening.count(),
       prisma.user.aggregate({ _sum: { coins: true } }),
+      prisma.user.count({ where: { createdAt: { gte: startOfDay } } }),
     ])
-    const recentUsers = await prisma.user.findMany({
-      orderBy: { createdAt: 'desc' },
-      take: 10,
-      select: { id: true, username: true, firstName: true, coins: true, createdAt: true }
+    return reply.send({
+      stats: {
+        totalUsers,
+        totalOpenings: openingCount,
+        totalCoinsInCirculation: totalCoins._sum.coins || 0,
+        newUsersToday,
+      }
     })
-    return reply.send({ userCount, itemCount, openingCount, totalCoins: totalCoins._sum.coins, recentUsers })
   })
 
   app.get('/users', async (request, reply) => {
@@ -27,22 +31,36 @@ export async function adminRoutes(app: FastifyInstance) {
       take: 100,
       select: {
         id: true, telegramId: true, username: true, firstName: true,
-        coins: true, tickets: true, experience: true, rank: true,
+        coins: true, tickets: true, level: true,
         isBanned: true, isAdmin: true, createdAt: true,
-        _count: { select: { caseOpenings: true } }
       }
     })
-    return reply.send(users)
+    return reply.send({ users })
   })
 
   app.patch('/users/:id/ban', async (request, reply) => {
     const { id } = request.params as { id: string }
-    const { banned } = request.body as { banned: boolean }
+    const { isBanned } = request.body as { isBanned: boolean }
     const user = await prisma.user.update({
       where: { id: parseInt(id) },
-      data: { isBanned: banned }
+      data: { isBanned }
     })
     return reply.send({ success: true, isBanned: user.isBanned })
+  })
+
+  app.post('/users/:id/gift', async (request, reply) => {
+    const { id } = request.params as { id: string }
+    const { coins = 0, tickets = 0 } = request.body as { coins?: number; tickets?: number }
+    const user = await prisma.user.update({
+      where: { id: parseInt(id) },
+      data: { coins: { increment: coins }, tickets: { increment: tickets } },
+    })
+    if (coins > 0) {
+      await prisma.transaction.create({
+        data: { userId: user.id, type: 'admin_gift', amount: coins, currency: 'coins', description: `Подарок от администратора` }
+      })
+    }
+    return reply.send({ success: true, coins: user.coins })
   })
 
   app.get('/promo-codes', async (request, reply) => {
@@ -80,6 +98,13 @@ export async function adminRoutes(app: FastifyInstance) {
       data: { isActive: !promo.isActive }
     })
     return reply.send(updated)
+  })
+
+  app.patch('/cases/:id/toggle', async (request, reply) => {
+    const { id } = request.params as { id: string }
+    const { isActive } = request.body as { isActive: boolean }
+    const c = await prisma.case.update({ where: { id: parseInt(id) }, data: { isActive } })
+    return reply.send({ success: true, isActive: c.isActive })
   })
 
   app.get('/contests', async (request, reply) => {

@@ -10,13 +10,14 @@ import { CasesPage } from './pages/CasesPage'
 import { GamesPage } from './pages/GamesPage'
 import { FriendsPage } from './pages/FriendsPage'
 import { ProfilePage } from './pages/ProfilePage'
+import { AdminPage } from './pages/AdminPage'
 
 const DEMO_MODE = import.meta.env.VITE_DEMO_MODE !== 'false'
 
 export default function App() {
   const { user, loading, error, fetchUser } = useUserStore()
   const { activeTab } = useAppStore()
-  const TAB_ORDER: Tab[] = ['games', 'cases', 'earnings', 'bonuses']
+  const TAB_ORDER: Tab[] = ['games', 'cases', 'earnings', 'bonuses', 'admin']
   const prevTabRef = useRef<Tab>('games')
   const dir = TAB_ORDER.indexOf(activeTab) >= TAB_ORDER.indexOf(prevTabRef.current) ? 1 : -1
   useEffect(() => { prevTabRef.current = activeTab }, [activeTab])
@@ -80,6 +81,7 @@ export default function App() {
             {activeTab === 'games'    && <GamesPage />}
             {activeTab === 'earnings' && <FriendsPage />}
             {activeTab === 'bonuses'  && <ProfilePage />}
+            {activeTab === 'admin'    && <AdminPage />}
           </motion.div>
         </AnimatePresence>
       </main>

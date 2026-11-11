@@ -13,6 +13,7 @@ import { contestRoutes } from './routes/contests.js'
 import { referralRoutes } from './routes/referrals.js'
 import { promoRoutes } from './routes/promo.js'
 import { adminRoutes } from './routes/admin.js'
+import { gameRoutes } from './routes/games.js'
 import { importCases } from './db/importCases.js'
 
 const app = Fastify({
@@ -46,6 +47,7 @@ await app.register(contestRoutes, { prefix: '/api/contests' })
 await app.register(referralRoutes, { prefix: '/api/referrals' })
 await app.register(promoRoutes, { prefix: '/api/promo' })
 await app.register(adminRoutes, { prefix: '/api/admin' })
+await app.register(gameRoutes, { prefix: '/api/games' })
 
 app.get('/health', async () => ({
   status: 'ok',
