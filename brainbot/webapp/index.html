@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no,viewport-fit=cover" />
+<title>Brain Battle</title>
+<link rel="stylesheet" href="style.css" />
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+</head>
+<body>
+
+<!-- ======= ВЕРХНЯЯ ПАНЕЛЬ ======= -->
+<header class="topbar">
+  <button class="icon-btn" id="menuBtn" aria-label="Меню">
+    <svg viewBox="0 0 24 24" width="22" height="22"><path fill="#4aa8ff" d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+  </button>
+  <div class="logo">
+    <span class="logo-brain">BRAIN</span>
+    <span class="logo-icon">🧠</span>
+    <span class="logo-battle">BATTLE</span>
+  </div>
+  <div class="balance" id="balanceBtn">
+    <span class="coin">Ⓑ</span>
+    <span id="balance">0</span>
+  </div>
+  <button class="plus-btn" id="topupBtn">+</button>
+</header>
+
+<!-- ======= ЭКРАН: КЕЙСЫ ======= -->
+<main class="screen active" id="screen-cases">
+  <!-- Топ-дроп баннер -->
+  <div class="topdrop-banner">
+    <div class="topdrop-img">🐘</div>
+    <div class="topdrop-text">
+      <div class="topdrop-label">ТОП ДРОП ЗА 24 ЧАСА</div>
+      <div class="topdrop-name">Strawberry Elephant</div>
+      <div class="topdrop-user">F******e</div>
+    </div>
+    <div class="topdrop-price"><span class="coin">Ⓑ</span> 42 509</div>
+  </div>
+
+  <!-- Горизонтальная лента последних дропов -->
+  <div class="hscroll">
+    <div class="drop-card"><div class="drop-ico" style="background:#1b3c1b;color:#9aff5c">🧱</div><div class="drop-name">Lavadorito<br>Spinito</div></div>
+    <div class="drop-card"><div class="drop-ico" style="background:#3a1b3a;color:#ff5cff">👾</div><div class="drop-name">Las Sis</div></div>
+    <div class="drop-card"><div class="drop-ico" style="background:#1b2a3a;color:#5cbcff">🚢</div><div class="drop-name">Capitano<br>Moby</div></div>
+    <div class="drop-card"><div class="drop-ico" style="background:#1b2a3a;color:#5cbcff">🚢</div><div class="drop-name">Capitano<br>Moby</div></div>
+    <div class="drop-card"><div class="drop-ico" style="background:#2a2a2a;color:#aaa">🍟</div><div class="drop-name">Burguri<br>Fry</div></div>
+  </div>
+
+  <!-- Промо-блок с бонусом -->
+  <div class="promo-card">
+    <div class="promo-head">
+      <span class="promo-label">АВТО-ПРОМОКОД · 00:43:48</span>
+    </div>
+    <div class="promo-body">
+      <div>
+        <div class="promo-big">+12%</div>
+        <div class="promo-sub">к депозиту</div>
+      </div>
+      <div class="promo-mascot">🐬</div>
+    </div>
+    <div class="promo-input">
+      <input type="text" value="LTM" readonly />
+      <button class="promo-copy">⧉</button>
+      <button class="promo-cta">Пополнить</button>
+    </div>
+  </div>
+
+  <!-- Поиск -->
+  <div class="search">
+    <span class="search-ico">🔍</span>
+    <input type="text" placeholder="Кейс или брейнрот" />
+  </div>
+
+  <!-- Бесплатный кейс -->
+  <div class="free-case-row">
+    <div class="free-case-ico">🎁</div>
+    <div>
+      <div class="free-case-title">Бесплатный</div>
+      <div class="free-case-sub"><span class="green">Открыть</span> · Следующий через 11ч 49м</div>
+    </div>
+  </div>
+
+  <!-- Кейсы -->
+  <div class="section-title">Кейсы</div>
+  <div class="cases-grid" id="casesGrid"></div>
+
+  <!-- Тематические -->
+  <div class="section-title">Тематические кейсы</div>
+  <div class="cases-grid" id="themesGrid"></div>
+
+  <!-- Партнёры -->
+  <div class="section-title">Партнёры</div>
+  <div class="cases-grid" id="partnersGrid"></div>
+</main>
+
+<!-- ======= ЭКРАН: ДЕТАЛИ КЕЙСА ======= -->
+<main class="screen" id="screen-case">
+  <button class="back-btn" id="backBtn">← Назад к кейсам</button>
+  <div class="case-hero">
+    <div class="case-hero-img" id="caseHeroImg">🎁</div>
+    <div class="case-hero-title" id="caseHeroTitle">Кейс</div>
+  </div>
+  <div class="qty-tabs">
+    <button class="qty-tab active" data-qty="1"><div>×1</div><div class="qty-price"><span class="coin">Ⓑ</span> <span id="qty1">500</span></div></button>
+    <button class="qty-tab" data-qty="3"><div>×3</div><div class="qty-price"><span class="coin">Ⓑ</span> <span id="qty3">1 500</span></div></button>
+    <button class="qty-tab" data-qty="5"><div>×5</div><div class="qty-price"><span class="coin">Ⓑ</span> <span id="qty5">2 500</span></div></button>
+  </div>
+  <div class="open-row">
+    <button class="open-btn" id="openBtn">Открыть за <span class="coin">Ⓑ</span> <span id="openPrice">500</span></button>
+    <button class="fast-btn">⚡<br>быстро</button>
+  </div>
+  <div class="section-title small">ЧТО МОЖЕТ ВЫПАСТЬ</div>
+  <div class="loot-grid" id="lootGrid"></div>
+</main>
+
+<!-- ======= ЭКРАН: АПГРЕЙД ======= -->
+<main class="screen" id="screen-upgrade">
+  <div class="dev-screen">
+    <div class="dev-ico">⬆️</div>
+    <div class="dev-title">Апгрейдер</div>
+    <div class="dev-sub">Улучшай предметы с шансом ×2, ×5, ×10</div>
+    <div class="dev-badge">🔧 В разработке</div>
+  </div>
+</main>
+
+<!-- ======= ЭКРАН: БЕСПЛАТНО ======= -->
+<main class="screen" id="screen-free">
+  <div class="section-title">Бесплатные кейсы</div>
+  <div class="cases-grid" id="freeGrid"></div>
+</main>
+
+<!-- ======= ЭКРАН: ПРОФИЛЬ ======= -->
+<main class="screen" id="screen-profile">
+  <div class="profile-card">
+    <div class="profile-avatar">👤</div>
+    <div class="profile-info">
+      <div class="profile-label">Telegram</div>
+      <div class="profile-name" id="profileName">@user</div>
+      <div class="profile-balance"><span class="coin">Ⓑ</span> <span id="profileBalance">0</span></div>
+    </div>
+  </div>
+  <div class="menu-item"><span>⚙️ Настройки</span><span>›</span></div>
+  <div class="section-title small">ИГРЫ</div>
+  <div class="menu-item big"><div><div class="mi-title">Апгрейдер</div><div class="mi-sub">Улучши предмет</div></div><div class="mi-ico">⬆️</div></div>
+  <div class="menu-item big"><div><div class="mi-title">Дайсы</div><div class="mi-sub">Ставка на число</div></div><div class="mi-ico">🎲</div></div>
+  <div class="menu-grid">
+    <div class="menu-tile"><div class="mi-ico-big">🚀</div><div class="mi-title">Краш</div><div class="mi-sub">Общий раунд</div></div>
+    <div class="menu-tile"><div class="mi-ico-big">⚔️</div><div class="mi-title">Батл</div><div class="mi-sub">Кейсы против игроков</div></div>
+  </div>
+  <div class="section-title small">НАГРАДЫ</div>
+  <div class="menu-grid">
+    <div class="menu-tile"><div class="mi-ico-big">🎁</div><div class="mi-title">Бонусы</div><div class="mi-sub">Стейкинг, рефералы</div></div>
+    <div class="menu-tile"><div class="mi-ico-big">📜</div><div class="mi-title">Квесты</div><div class="mi-sub">Задания и награды</div></div>
+    <div class="menu-tile"><div class="mi-ico-big">🎡</div><div class="mi-title">Колесо недели</div><div class="mi-sub">Прогресс недели</div></div>
+    <div class="menu-tile"><div class="mi-ico-big">🏆</div><div class="mi-title">Розыгрыши</div><div class="mi-sub">День, неделя, месяц</div></div>
+  </div>
+  <div class="menu-item"><span>❓ Частые вопросы</span><span>›</span></div>
+  <div class="menu-item"><span>💬 Поддержка</span><span>›</span></div>
+  <div class="menu-item"><span>🌐 Язык</span><span>Русский ›</span></div>
+</main>
+
+<!-- ======= МОДАЛКА ПОПОЛНЕНИЯ ======= -->
+<div class="modal" id="topupModal">
+  <div class="modal-body">
+    <div class="modal-head">
+      <h2>Пополнение</h2>
+      <button class="icon-btn" id="closeTopup">✕</button>
+    </div>
+    <div class="topup-tabs">
+      <button class="tt active">🤖<br>Брейнроты</button>
+      <button class="tt">🖐️<br>Гирсы</button>
+      <button class="tt">⭐<br>Звёзды</button>
+      <button class="tt">₽<br>Рубли</button>
+    </div>
+    <div class="topup-form">
+      <label>КОЛИЧЕСТВО ЗВЁЗД</label>
+      <input type="number" placeholder="Например: 625" />
+      <label>ПРОМОКОД</label>
+      <input type="text" placeholder="Введи код" />
+      <button class="open-btn full" id="createInvoice">Создать счёт в звёздах</button>
+      <div class="hint">Введи количество звёзд выше.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ======= МОДАЛКА ОТКРЫТИЯ КЕЙСА ======= -->
+<div class="modal" id="openModal">
+  <div class="modal-body center">
+    <div class="open-anim" id="openAnim">🎁</div>
+    <div class="open-title" id="openTitle">Открываем...</div>
+    <div class="open-sub" id="openSub"></div>
+    <button class="open-btn full" id="closeOpen" style="display:none">Забрать</button>
+  </div>
+</div>
+
+<!-- ======= НИЖНЯЯ НАВИГАЦИЯ ======= -->
+<nav class="bottomnav">
+  <button class="nav-item active" data-screen="cases"><div class="nav-ico">📦</div><div>Кейсы</div></button>
+  <button class="nav-item" data-screen="upgrade"><div class="nav-ico">⬆️</div><div>Апгрейд</div></button>
+  <button class="nav-item" data-screen="free"><div class="nav-ico">🎁</div><div>Бесплатно</div></button>
+  <button class="nav-item" data-screen="profile"><div class="nav-ico">👤</div><div>Профиль</div></button>
+</nav>
+
+<script src="app.js"></script>
+</body>
+</html>
